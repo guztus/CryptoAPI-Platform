@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App;
 
@@ -10,8 +10,8 @@ class APIRequest
 
     public function __construct()
     {
-//        $url = 'https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
-$url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
+        $url = 'https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'; // DUMMY
+//$url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
         $parameters = [
             'start' => '1',
             'limit' => '10',
@@ -20,8 +20,8 @@ $url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
 
         $headers = [
             'Accepts: application/json',
-//            "X-CMC_PRO_API_KEY: {$_ENV['APIKEY_DUMMY']}"
-        "X-CMC_PRO_API_KEY: {$_ENV['APIKEY']}"
+            "X-CMC_PRO_API_KEY: {$_ENV['APIKEY_DUMMY']}"
+//        "X-CMC_PRO_API_KEY: {$_ENV['APIKEY']}"
 
         ];
         $qs = http_build_query($parameters); // query string encode the parameters

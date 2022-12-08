@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Services;
 
 use App\Models\Collections\CoinCollection;
-use App\Repositories\CoinsRepository;
-use App\Repositories\CryptoCoinsRepository;
+use App\Repositories\Coins\CoinsRepository;
+use App\Repositories\Coins\CryptoCoinsRepository;
 
 class CoinsService
 {

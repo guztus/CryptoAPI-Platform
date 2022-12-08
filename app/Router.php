@@ -3,6 +3,8 @@
 namespace App;
 
 use App\Controllers\LoginController;
+use App\Controllers\LogoutController;
+use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
 use FastRoute;
 use App\Controllers\MainController;
@@ -13,8 +15,12 @@ class Router
     {
         $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $router) {
             $router->addRoute('GET', '/', [MainController::class, 'index']);
-            $router->addRoute('GET', '/register', [RegistrationController::class, 'index']);
-            $router->addRoute('GET', '/login', [LoginController::class, 'index']);
+            $router->addRoute('GET', '/register', [RegistrationController::class, 'showForm']);
+            $router->addRoute('POST', '/register', [RegistrationController::class, 'register']);
+            $router->addRoute('GET', '/login', [LoginController::class, 'showForm']);
+            $router->addRoute('POST', '/login', [LoginController::class, 'login']);
+            $router->addRoute('GET', '/logout', [LogoutController::class, 'logout']);
+            $router->addRoute('GET', '/profile', [ProfileController::class, 'showForm']);
         });
 
 // Fetch method and URI from somewhere
@@ -48,14 +54,16 @@ class Router
 
                 $twig = (new TwigLoader())->getTwig();
 
-//                var_dump((new $controller)->{$method}());die;
                 $response = (new $controller)->{$method}();
                 if ($response instanceof Template) {
                     echo $twig->render($response->getPath(), $response->getParameters());
+
+                    unset($_SESSION['errors']);
+                    unset($_SESSION['alerts']);
                 }
 
                 if ($response instanceof Redirect) {
-                    header($response->getPath());
+                    header("Location: " . $response->getPath());
                 }
         }
     }
