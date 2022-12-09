@@ -19,9 +19,7 @@ class LoginController
         $validator = new Validator();
         $validator->login($_POST['email'], $_POST['password']);
 
-        if (!Validator::passed()) {
-            $_SESSION['errors']['login'] [] = 'Credentials are incorrect';
-        } else {
+        if (Validator::passed()) {
             $_SESSION['alerts']['success'] [] = 'Login successful!';
             $currentUser = (new UserService())->getUserData(null, $_POST['email']);
 

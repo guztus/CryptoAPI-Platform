@@ -20,7 +20,7 @@ class Validator
     {
         $user = (new Database())->getConnection()->fetchAssociative('SELECT * FROM users WHERE email = ?', [$email]);
         if (!$user || !password_verify($password, $user['password'])) {
-            $_SESSION['errors']['password'] [] = 'Login failed. Please check that all fields are filled out correctly and try again!';
+            $_SESSION['errors']['login'] [] = 'Login failed. Please make sure that all fields are filled out correctly and try again!';
         }
     }
 
