@@ -15,11 +15,10 @@ class AuthViewVariables implements ViewVariablesInterface
     {
         if (!empty($_SESSION['auth_id'])) {
             $currentUser = (new UserService())->getUserData($_SESSION['auth_id']);
-
             return [
-                'id' => $currentUser->getId() ?? [],
-                'email' => $currentUser->getEmail() ?? [],
-                'name' => $currentUser->getName() ?? [],
+                'id' => $currentUser->getId() ?? null,
+                'email' => $currentUser->getEmail() ?? null,
+                'name' => $currentUser->getName() ?? null,
             ];
         }
         return [];
