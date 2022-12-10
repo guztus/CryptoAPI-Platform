@@ -28,9 +28,12 @@
 
 <div class="d-flex flex-column" style="margin-top: 1.4em">
     {% if auth %}
-    <div style="text-align: center">
-        <h3>Hello, {{ auth.name }}</h3>
-    </div>
+        <div style="text-align: center">
+            <h3>Hello, {{ auth.name }}</h3>
+        </div>
+        <div>
+            <h3>FIAT balance: {{ auth.fiatBalance }}</h3>
+        </div>
     {% endif %}
     <div style="text-align: center">
         <h2>List of 10 coins sorted by market cap</h2>
@@ -48,23 +51,26 @@
             <th>24h%</th>
             <th>Volume</th>
             <th>Market Cap</th>
+            <th>Link</th>
         </tr>
         </thead>
         {% for coin in coins %}
             <tbody>
-            <tr>
-                <td id="centered">{{ coin.cmcrank }}</td>
-                <td id="centered"><img style="width: 30px" src="https://logo.chainbit.xyz/{{ coin.symbol }}" alt="{{ coin.symbol }}"></td>
-                <td id="centered">{{ coin.symbol }}</td>
-                <td>${{ coin.price|number_format(4, '.', ',') }}</td>
-                {% if coin.percentChange24h < 0 %}
-                    <td style="color: darkred">{{ coin.percentChange24h|number_format(2, '.', ',') }}</td>
-                {% else %}
-                    <td style="color: darkgreen">+{{ coin.percentChange24h|number_format(2, '.', ',') }}</td>
-                {% endif %}
-                <td>${{ coin.volume24h|number_format(2, '.', ',') }}</td>
-                <td>${{ coin.marketCap|number_format(2, '.', ',') }}</td>
-            </tr>
+                <tr>
+                    <td id="centered">{{ coin.cmcrank }}</td>
+                    <td id="centered"><img style="width: 30px" src="https://logo.chainbit.xyz/{{ coin.symbol }}"
+                                           alt="{{ coin.symbol }}"></td>
+                    <td id="centered">{{ coin.symbol }}</td>
+                    <td>${{ coin.price|number_format(4, '.', ',') }}</td>
+                    {% if coin.percentChange24h < 0 %}
+                        <td style="color: darkred">{{ coin.percentChange24h|number_format(2, '.', ',') }}▼</td>
+                    {% else %}
+                        <td style="color: darkgreen">+{{ coin.percentChange24h|number_format(2, '.', ',') }}▲</td>
+                    {% endif %}
+                    <td>${{ coin.volume24h|number_format(2, '.', ',') }}</td>
+                    <td>${{ coin.marketCap|number_format(2, '.', ',') }}</td>
+                    <td><a href="/?search={{ coin.symbol }}">Link</a></td>
+                </tr>
             </tbody>
         {% endfor %}
     </table>

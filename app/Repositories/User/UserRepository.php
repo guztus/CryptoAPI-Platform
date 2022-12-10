@@ -19,13 +19,17 @@ class UserRepository
         return null;
     }
 
+//    public function modifyBalance(){
+//
+//    }
+
     private function getUserById(?int $id): ?User
     {
         if ($id == null) {
             return null;
         }
         $user = (new Database())->getConnection()->fetchAssociative('SELECT * FROM users WHERE id = ?', [$id]);
-        return new User((int)$user['id'], $user['name'], $user['email'], $user['password']);
+        return new User((int)$user['id'], $user['name'], $user['email'], $user['password'], (float)$user['fiat_balance']);
     }
 
     private function getUserByEmail(string $email): ?User
@@ -35,6 +39,6 @@ class UserRepository
         if (!$user) {
             return null;
         }
-        return new User((int)$user['id'], $user['name'], $user['email'], $user['password']);
+        return new User((int)$user['id'], $user['name'], $user['email'], $user['password'], (float)$user['fiat_balance']);
     }
 }

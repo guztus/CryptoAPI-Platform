@@ -2,15 +2,15 @@
 
 namespace App\Repositories\Coins;
 
-use App\APIRequest;
+use App\CoinMarketCapCryptoAPI;
 use App\Models\Coin;
 use App\Models\Collections\CoinCollection;
 
-class CryptoCoinsRepository implements CoinsRepository
+class CoinMarketCapCryptoCoinsRepository implements CoinsRepository
 {
     public function getList(): CoinCollection
     {
-        $results = (new APIRequest())->getResults();
+        $results = (new CoinMarketCapCryptoAPI())->getList();
         $coins = new CoinCollection();
 
         foreach ($results->data as $coin) {
@@ -34,5 +34,27 @@ class CryptoCoinsRepository implements CoinsRepository
             );
         }
         return $coins;
+    }
+
+    public function getBySymbol(string $coinSymbol): Coin
+    {
+        $result = (new CoinMarketCapCryptoAPI())->getSingle($coinSymbol)->data->$coinSymbol[0];
+
+        return new Coin(
+            $result->id,
+            $result->name,
+            $result->symbol,
+            $result->date_added,
+            $result->max_supply,
+            $result->circulating_supply,
+            $result->total_supply,
+            $result->cmc_rank,
+            $result->last_updated,
+            $result->quote->USD->price,
+            $result->quote->USD->volume_24h,
+            $result->quote->USD->volume_change_24h,
+            $result->quote->USD->percent_change_24h,
+            $result->quote->USD->market_cap,
+        );
     }
 }

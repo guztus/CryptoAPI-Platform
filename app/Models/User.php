@@ -8,13 +8,15 @@ class User
     private string $name;
     private string $email;
     private string $password;
+    private float $fiatBalance;
 
-    public function __construct(?int $id, string $name, string $email, string $password)
+    public function __construct(?int $id, string $name, string $email, string $password, float $fiatBalance)
     {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
+        $this->fiatBalance = $fiatBalance;
     }
 
     public function getId(): ?int
@@ -35,5 +37,10 @@ class User
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    public function getFiatBalance(): float
+    {
+        return $this->fiatBalance;
     }
 }

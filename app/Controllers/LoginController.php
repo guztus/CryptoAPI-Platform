@@ -24,8 +24,8 @@ class LoginController
             $currentUser = (new UserService())->getUserData(null, $_POST['email']);
 
             $_SESSION['auth_id'] = $currentUser->getId();
-            return new Redirect('/');
+            return Redirect::to('/');
         }
-        return new Redirect('/login');
+        return Redirect::to('/login');
     }
 }

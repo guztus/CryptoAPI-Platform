@@ -15,4 +15,9 @@ class Redirect
     {
         return $this->path;
     }
+
+    public static function to(string $path): Redirect
+    {
+        return new Redirect($path);
+    }
 }

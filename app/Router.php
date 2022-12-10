@@ -2,19 +2,20 @@
 
 namespace App;
 
+use App\Controllers\CoinsController;
 use App\Controllers\LoginController;
 use App\Controllers\LogoutController;
 use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
 use FastRoute;
-use App\Controllers\MainController;
 
 class Router
 {
     public static function route()
     {
         $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $router) {
-            $router->addRoute('GET', '/', [MainController::class, 'index']);
+            $router->addRoute('GET', '/', [CoinsController::class, 'index']);
+            $router->addRoute('POST', '/', [CoinsController::class, 'doTransaction']);
             $router->addRoute('GET', '/register', [RegistrationController::class, 'showForm']);
             $router->addRoute('POST', '/register', [RegistrationController::class, 'register']);
             $router->addRoute('GET', '/login', [LoginController::class, 'showForm']);

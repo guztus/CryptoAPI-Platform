@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Collections\CoinCollection;
 use App\Repositories\Coins\CoinsRepository;
-use App\Repositories\Coins\CryptoCoinsRepository;
+use App\Repositories\Coins\CoinMarketCapCryptoCoinsRepository;
+use App\Repositories\Coins\OtherServiceCryptoCoinsRepository;
 
 class CoinsService
 {
@@ -12,11 +12,15 @@ class CoinsService
 
     public function __construct()
     {
-        $this->coinsRepository = new CryptoCoinsRepository();
+        $this->coinsRepository = new OtherServiceCryptoCoinsRepository();
+//        $this->coinsRepository = new CoinMarketCapCryptoCoinsRepository();
     }
 
-    public function execute(): CoinCollection
+    public function execute(?string $coinSymbol = null)
     {
+        if ($coinSymbol) {
+            return $this->coinsRepository->getBySymbol($coinSymbol);
+        }
         return $this->coinsRepository->getList();
     }
 }

@@ -13,7 +13,7 @@ class CoinCollection
         $this->coins = array_merge($this->coins, $coins);
     }
 
-    public function getCoins(): array
+    public function getAllCoins(): array
     {
         return $this->coins;
     }

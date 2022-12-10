@@ -19,6 +19,7 @@ class AuthViewVariables implements ViewVariablesInterface
                 'id' => $currentUser->getId() ?? null,
                 'email' => $currentUser->getEmail() ?? null,
                 'name' => $currentUser->getName() ?? null,
+                'fiatBalance' => $currentUser->getFiatBalance() ?? null,
             ];
         }
         return [];

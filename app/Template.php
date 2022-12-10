@@ -22,4 +22,9 @@ class Template
     {
         return $this->parameters;
     }
+
+    public static function render(string $path, array $parameters = []): Template
+    {
+        return new Template($path, $parameters);
+    }
 }

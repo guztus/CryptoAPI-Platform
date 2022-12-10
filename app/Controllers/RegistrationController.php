@@ -11,7 +11,7 @@ class RegistrationController
 {
     public function showForm(): Template
     {
-        return new Template('/registration/registration.view.twig');
+        return Template::render('/registration/registration.view.twig');
     }
 
     public function register(): Redirect
@@ -23,6 +23,6 @@ class RegistrationController
 
             (new RegistrationService())->execute($_POST['name'], $_POST['email'], password_hash($_POST['password'], PASSWORD_DEFAULT));
         }
-        return new Redirect('/register');
+        return Redirect::to('/register');
     }
 }

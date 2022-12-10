@@ -11,6 +11,8 @@
         "ext-curl": "*",
         "vlucas/phpdotenv": "^5.5",
         "egulias/email-validator": "^3.2",
-        "doctrine/dbal": "^3.5"
+        "doctrine/dbal": "^3.5",
+        "guzzlehttp/guzzle": "^7.5",
+      "ext-json": "*"
     }
 }

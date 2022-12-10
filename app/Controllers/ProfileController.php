@@ -10,8 +10,8 @@ class ProfileController
     public function showForm()
     {
         if (empty($_SESSION['auth_id'])) {
-            return new Redirect('/login');
+            return Redirect::to('/login');
         }
-        return new Template('profile/profile.view.twig');
+        return Template::render('profile/profile.view.twig');
     }
 }
