@@ -19,6 +19,6 @@ class OtherServiceCryptoCoinsRepository implements CoinsRepository
 
     public function getBySymbol(string $symbol): Coin
     {
-        return new Coin(3, 'nonExistentCoin3', 'DmC', '1', 1, 1, 1, 2, 2, 1.2, 3, 3, -3, 3);
+        return new Coin(3, 'nonExistentCoin3', 'NeC3', '1', 1234234234, 1234234234, 12342342344244, 2, 2, 2.4, 3234234234, 32, -52, 1231231233);
     }
 }

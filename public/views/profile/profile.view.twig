@@ -13,6 +13,21 @@
 
 {% include 'navBar/navBar.view.twig' %}
 
+{% for error in errors.search %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+{% endfor %}
+
+{#Show user FIAT balance#}
+<div class="container my-3">
+    <div class="row">
+        <div class="col-12">
+            <h1>Profile</h1>
+            <h3>FIAT balance: {{ auth.fiatBalance|number_format(2, '.', ',') }}</span></h3>
+        </div>
+    </div>
+
 <div class="container mt-5 d-flex  bg-light p-3" style="flex-direction: column">
     <div>
         <a>Name: {{ auth.name }}</a>
@@ -20,6 +35,17 @@
     <div>
         <a>Email: {{ auth.email }}</a>
     </div>
+
+    <form class="my-2" method="POST">
+        <input name="transactionType" value="deposit" type="hidden">
+        <input type="number" name="fiatAmount" step="0.01" placeholder="Deposit $">
+        <button type="submit" class="btn btn-primary my-2">Deposit</button>
+    </form>
+    <form class="my-2" method="POST">
+        <input name="transactionType" value="withdraw" type="hidden">
+        <input type="number" name="fiatAmount" step="0.01" placeholder="Withdraw $">
+        <button type="submit" class="btn btn-primary my-2">Withdraw</button>
+    </form>
 </div>
 
 </body>

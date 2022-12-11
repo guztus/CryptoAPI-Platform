@@ -5,6 +5,7 @@ namespace App;
 use App\ViewVariables\AlertsViewVariables;
 use App\ViewVariables\AuthViewVariables;
 use App\ViewVariables\ErrorsViewVariables;
+use App\ViewVariables\UserAssetsViewVariables;
 use App\ViewVariables\ViewVariablesInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -29,6 +30,7 @@ class TwigLoader
             AuthViewVariables::class,
             AlertsViewVariables::class,
             ErrorsViewVariables::class,
+            UserAssetsViewVariables::class
         ];
 
         foreach ($authVariables as $variable) {

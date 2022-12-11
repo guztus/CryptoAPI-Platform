@@ -9,8 +9,4 @@ Session::start();
 
 (Dotenv\Dotenv::createImmutable('../'))->load();
 
-//    $_SESSION['errors'] ?? []
-
-//var_dump(Session::has('test') ? [] : Session::);
-
 Router::route();

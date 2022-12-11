@@ -2,9 +2,7 @@
 
 namespace App;
 
-use App\Models\Collections\CoinCollection;
 use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
 
 class CoinMarketCapCryptoAPI
 {
@@ -23,17 +21,15 @@ class CoinMarketCapCryptoAPI
 
     public function getList(): Object
     {
-        $this->fetchListCoinInformation();
-        return $this->results;
+        return $this->fetchListCoinInformation();
     }
 
-    public function getSingle(string $coinSymbol): Object
+    public function getSingle(string $coinSymbol): ?Object
     {
-        $this->fetchSingleCoinInformation($coinSymbol);
-        return $this->results;
+        return $this->fetchSingleCoinInformation($coinSymbol);
     }
 
-    private function fetchSingleCoinInformation(string $coinSymbol): void
+    private function fetchSingleCoinInformation(string $coinSymbol): ?object
     {
         $url = $this->url . 'v2/cryptocurrency/quotes/latest';
 
@@ -42,10 +38,14 @@ class CoinMarketCapCryptoAPI
             'convert' => 'USD'
         ];
 
-        $this->results = $this->getResults($url, $parameters, $this->headers);
+        $resultFetched = $this->getResults($url, $parameters, $this->headers);
+        if (empty($resultFetched->data->$coinSymbol)){
+            return null;
+        }
+        return $resultFetched;
     }
 
-    private function fetchListCoinInformation(): void
+    private function fetchListCoinInformation(): object
     {
         $url = $this->url . 'v1/cryptocurrency/listings/latest';
 
@@ -55,10 +55,10 @@ class CoinMarketCapCryptoAPI
             'convert' => 'USD'
         ];
 
-        $this->results = $this->getResults($url, $parameters, $this->headers);
+        return $this->getResults($url, $parameters, $this->headers);
     }
 
-    private function getResults($url, $parameters, $headers): Object
+    private function getResults($url, $parameters, $headers): object
     {
         $client = new Client();
         $response = $client->request('GET', $url, [

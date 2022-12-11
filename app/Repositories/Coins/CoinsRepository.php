@@ -8,5 +8,5 @@ use App\Models\Collections\CoinCollection;
 interface CoinsRepository
 {
     public function getList(): CoinCollection;
-    public function getBySymbol(string $symbol): Coin;
+    public function getBySymbol(string $symbol): ?Coin;
 }

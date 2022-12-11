@@ -8,49 +8,164 @@
     <title>{{ coin.symbol }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .monospace {
+            font-family: monospace
+        }
+
+        td {
+            font-size: 0.9em;
+            font-family: monospace;
+            text-align: right
+        }
+
+        th {
+            font-size: 0.9em;
+        }
+
+        .alert {
+            width: 40%;
+            margin: auto;
+            text-align: center
+        }
+    </style>
 </head>
 <body>
 
 {% include 'navBar/navBar.view.twig' %}
-
-<div>
-    <h3>FIAT balance: {{ auth.fiatBalance }}</h3>
-</div>
-
-<div class="card mx-auto" style="margin-top: 3em ; width: 18rem;">
-    <div class="d-flex m-4" style="justify-content: center">
-        <img class="text-center" style="width: 30px" src="https://logo.chainbit.xyz/{{ coin.symbol }}"
-             alt="{{ coin.symbol }}">
+<div class="container mt-5 d-flex flex-column">
+    <div>
+        <h3>FIAT balance: {{ auth.fiatBalance|number_format(2, '.', ',') }}</h3>
     </div>
-    <div class="card-body">
-        <h5 class="card-title text-center">{{ coin.symbol }}</h5>
-        <p class="card-text">
-            Price: $<span>{{ coin.price|number_format(4, '.', ',') }}</span><br>
 
-            {% if coin.percentChange24h < 0 %}
-                Percent change (24h): <span
-                    style="color: darkred">{{ coin.percentChange24h|number_format(2, '.', ',') }}</span><br>
-            {% else %}
-                Percent change (24h): <span
-                    style="color: darkgreen">{{ coin.percentChange24h|number_format(2, '.', ',') }}</span><br>
-            {% endif %}
+    {% for error in errors.transaction %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% endfor %}
 
-            Volume (24h): {{ coin.volume24h|number_format(2, '.', ',') }}<br>
-        </p>
-        <form class="my-2" method="POST">
-            <input name="symbol" value="{{ coin.symbol }}" type="hidden">
-            <input type="number" name="buy" placeholder="$">
-            <button type="submit" class="btn btn-primary my-2">Buy</button>
-        </form>
-        <form class="my-2" method="POST">
-            <input name="symbol" value="{{ coin.symbol }}" type="hidden">
-            <input type="number" name="sell" placeholder="$">
-            <button type="submit" class="btn btn-primary my-2">Sell</button>
-        </form>
-{#        <div class="flex">#}
-{#            <a href="#" class="btn btn-primary" style="align-self: center">Buy</a>#}
-{#            <a href="#" class="btn btn-primary" style="align-self: flex-end">Sell</a>#}
-{#        </div>#}
+    {% for alert in alerts.transaction %}
+        <div class="alert alert-info" role="alert">
+            {{ alert }}
+        </div>
+    {% endfor %}
+
+    <div class="card mx-auto" style="margin-top: 3em ; width: 26rem; margin-bottom: 3em">
+        <div class="d-flex m-2 my-5" style="justify-content: center">
+            <img class="text-center" style="width: 80px" src="https://logo.chainbit.xyz/{{ coin.symbol }}"
+                 alt="{{ coin.symbol }}">
+        </div>
+        <div class="card-body">
+            <h5 class="card-title text-center">{{ coin.symbol }}</h5>
+            <div class="flex flex-col">
+                {% if coin.percentChange24h < 0 %}
+                    <div style="text-align: center">
+                        <a style="font-weight: bold; font-size: 1.4em">
+                            $<span class="monospace">{{ coin.price|number_format(4, '.', ',') }}</span>
+                        </a>
+                        <a>
+                            <span class="monospace"
+                                  style="color: darkred;
+                                  font-size: 0.8em;
+                                  vertical-align: super">{{ coin.percentChange24h|number_format(2, '.', ',') }}▼</span>
+                        </a>
+                    </div>
+                {% else %}
+                    <div style="text-align: center">
+                        <a style="font-weight: bold; font-size: 1.4em">
+                            $<span class="monospace">{{ coin.price|number_format(4, '.', ',') }}</span>
+                        </a>
+                        <a>
+                            <span class="monospace"
+                                  style="color: darkgreen;
+                                  font-size: 0.8em;
+                                  vertical-align: super">{{ coin.percentChange24h|number_format(2, '.', ',') }}▲</span>
+                        </a>
+                    </div>
+                {% endif %}
+
+                <table class="table table-light table-hover table-condensed"
+                       style="border-radius: 10px; overflow: hidden; margin-top: 1em">
+                    <tr>
+                        <th>Volume (24h):</th>
+                        <td>
+                            {{ coin.volume24h|number_format(2, '.', ',') }}
+                            {% if coin.volumeChange24h > 0 %}
+                                <span class="monospace"
+                                      style="color: darkgreen; font-size: 0.6em; vertical-align: super">{{ coin.volumeChange24h|number_format(2, '.', ',') }}▲</span>
+                            {% else %}
+                                <span class="monospace"
+                                      style="color: darkred; font-size: 0.6em; vertical-align: super">{{ coin.volumeChange24h|number_format(2, '.', ',') }}▼</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Market cap:</th>
+                        <td>
+                            {{ coin.marketCap|number_format(2, '.', ',') }}
+                            {% if coin.marketCapChange24h > 0 %}
+                                <span class="monospace"
+                                      style="color: darkgreen; font-size: 0.6em; vertical-align: super">{{ coin.marketCapChange24h|number_format(2, '.', ',') }}▲</span>
+                            {% else %}
+                                <span class="monospace"
+                                      style="color: darkred; font-size: 0.6em; vertical-align: super">{{ coin.marketCapChange24h|number_format(2, '.', ',') }}▼</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Circulating supply:</th>
+                        <td>{{ coin.circulatingSupply|number_format(2, '.', ',') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Max supply:</th>
+                        <td>{{ coin.maxSupply|number_format(2, '.', ',') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total supply:</th>
+                        <td>{{ coin.totalSupply|number_format(2, '.', ',') }}</td>
+                    </tr>
+                </table>
+
+                <div style="border:1px solid lightgray; padding: 1em; margin-top: 1em; border-radius: 5px">
+                    <div>
+                        <a>You own:
+                            <span
+                                    class="monospace">{{ userAsset.amount|number_format(6, '.', ',') }}
+                            </span>{{ coin.symbol }}
+{#                            <span style="font-size: 0.8em">worth $<span#}
+{#                                        class="monospace">{{ (userAsset.amount * coin.price)|number_format(2, '.', ',') }}</span>#}
+{#                                </span>#}
+                        </a>
+                    </div>
+                    <div style="text-align: right">
+                        <a style="font-size: 0.8em">
+                            (Your avg. cost: <span
+                                    class="monospace">{{ userAsset.average_cost|number_format(2, '.', ',') }}</span>)
+                        </a>
+                    </div>
+                    <div class="d-flex" style="margin-right: 3em; margin-left: 3em">
+                        <form class="my-2" method="POST">
+                            <input name="symbol" value="{{ coin.symbol }}" type="hidden">
+                            <input name="transactionType" value="buy" type="hidden">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">$</span>
+                                <input type="number" name="fiatAmount" step="0.01" class="form-control">
+                            </div>
+                            <div class="d-flex" style="padding-right: 4em; padding-left: 4em">
+                                <div>
+                                    <input type="submit" name="transactionType" value="buy"
+                                           class="btn btn-primary my-2">
+                                </div>
+                                <div style="margin-left: auto">
+                                    <input type="submit" name="transactionType" value="sell"
+                                           class="btn btn-primary my-2">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

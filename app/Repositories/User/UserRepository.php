@@ -19,9 +19,16 @@ class UserRepository
         return null;
     }
 
-//    public function modifyBalance(){
-//
-//    }
+    public function modifyFiatBalance(int $id, float $fiatAmount, string $operation)
+    {
+        if ($operation == 'sell' || $operation == 'deposit') {
+            $operator = '+';
+        } else {
+            $operator = '-';
+        }
+        $query = (new Database())->getConnection()->createQueryBuilder()->update('users')->set('fiat_balance', "fiat_balance $operator $fiatAmount")->where($id);
+        $query->executeStatement();
+    }
 
     private function getUserById(?int $id): ?User
     {

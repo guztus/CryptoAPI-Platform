@@ -11,6 +11,16 @@
                     <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
             </ul>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <form action="/">
+                        <div class="d-flex">
+                            <input type="text" placeholder="Search for a coin" name="search" class="form-control">
+                            <button type="submit" class="btn btn-primary"  style="margin-left: 0.2em">Search</button>
+                        </div>
+                    </form>
+                </li>
+            </ul>
             <ul class="navbar-nav me-right mb-2 mb-lg-0">
                 <li class="nav-item dropstart">
                     {% if auth %}
@@ -20,6 +30,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                            <li><a class="dropdown-item" href="/portfolio">Portfolio</a></li>
                             <li><a class="dropdown-item" href="/logout">Log out</a></li>
                         </ul>
                     {% else %}

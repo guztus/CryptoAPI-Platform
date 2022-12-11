@@ -5,6 +5,7 @@ namespace App;
 use App\Controllers\CoinsController;
 use App\Controllers\LoginController;
 use App\Controllers\LogoutController;
+use App\Controllers\PortfolioController;
 use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
 use FastRoute;
@@ -22,6 +23,8 @@ class Router
             $router->addRoute('POST', '/login', [LoginController::class, 'login']);
             $router->addRoute('GET', '/logout', [LogoutController::class, 'logout']);
             $router->addRoute('GET', '/profile', [ProfileController::class, 'showForm']);
+            $router->addRoute('POST', '/profile', [ProfileController::class, 'update']);
+            $router->addRoute('GET', '/portfolio', [PortfolioController::class, 'index']);
         });
 
 // Fetch method and URI from somewhere
