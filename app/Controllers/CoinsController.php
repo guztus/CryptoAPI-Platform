@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Redirect;
 use App\Services\CoinsService;
 use App\Template;
 use App\Validator;
@@ -22,8 +23,12 @@ class CoinsController
         return Template::render('/main/coinList.view.twig', ['coins' => $coinList]);
     }
 
-    public function doTransaction()
+    public function doTransaction(): Redirect
     {
-        (new Validator())->transactionOrder($_SESSION['auth_id'], $_POST['symbol'], $_POST['transactionType'], $_POST['fiatAmount']);
+        if (!$_SESSION['auth_id']) {
+            $_SESSION['errors']['transaction'] [] = 'You must be logged in to do transactions!';
+            return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
+        }
+        return (new Validator())->transactionOrder($_SESSION['auth_id'], $_POST['symbol'], $_POST['transactionType'], $_POST['fiatAmount']);
     }
 }

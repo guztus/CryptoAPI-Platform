@@ -29,13 +29,12 @@ class Validator
         }
     }
 
-    public function transactionOrder(int $userId, string $symbol, string $transactionType, string $fiatAmount)
+    public function transactionOrder(int $userId, string $symbol, string $transactionType, string $fiatAmount): Redirect
     {
         //        if ($fiatAmount < 0 || $fiatAmount !== (float)$fiatAmount) {
         if ($fiatAmount < 0 || !$fiatAmount) {
             $_SESSION['errors']['transaction'] [] = 'Transaction error';
-            header("Location: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-            die;
+            return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
 
         $currentCoinPrice = ((new CoinsService())->execute($symbol))->getPrice();
@@ -45,16 +44,14 @@ class Validator
         // if is BUY order and user does not have enough FIAT balance
         if ($transactionType == 'buy' && $fiatAmount > $userFiatBalance) {
             $_SESSION['errors']['transaction'] [] = 'You do not have enough money to buy this amount of coins!';
-            header("Location: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-            die;
+            return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
 
         // if is SELL order and user does not have enough COIN balance
         $currentAssetAmount = (new UserAssetsService())->getAssetAmount($userId, $symbol);
         if ($transactionType == 'sell' && $fiatAmount > $currentAssetAmount * $currentCoinPrice) {
             $_SESSION['errors']['transaction'] [] = 'You do not have enough coins to sell this amount!';
-            header("Location: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-            die;
+            return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
 
         $assetAmount = $fiatAmount / $currentCoinPrice;
@@ -66,8 +63,7 @@ class Validator
 
         $_SESSION['alerts']['transaction'] [] = ucfirst($transactionType) . " order successful: $assetAmount $symbol for $fiatAmount USD!";
 
-        header("Location: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-        die;
+        return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
     }
 
     private function registrationEmail(string $email)
