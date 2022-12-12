@@ -2,7 +2,7 @@
 
 namespace App\ViewVariables;
 
-use App\Services\UserService;
+use App\Services\User\UserService;
 
 class AuthViewVariables implements ViewVariablesInterface
 {

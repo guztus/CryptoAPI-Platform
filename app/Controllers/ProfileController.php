@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Redirect;
-use App\Services\UserService;
+use App\Services\User\UserService;
 use App\Template;
 
 class ProfileController

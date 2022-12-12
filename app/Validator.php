@@ -4,8 +4,8 @@ namespace App;
 
 use App\Repositories\User\UserAssetsRepository;
 use App\Services\CoinsService;
-use App\Services\UserAssetsService;
-use App\Services\UserService;
+use App\Services\User\UserAssetsService;
+use App\Services\User\UserService;
 
 class Validator
 {
