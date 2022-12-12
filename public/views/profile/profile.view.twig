@@ -20,6 +20,7 @@
 {% endfor %}
 
 {#Show user FIAT balance#}
+{% if auth %}
 <div class="container my-3">
     <div class="row">
         <div class="col-12">
@@ -27,6 +28,7 @@
             <h3>FIAT balance: {{ auth.fiatBalance|number_format(2, '.', ',') }}</span></h3>
         </div>
     </div>
+{% endif %}
 
 <div class="container mt-5 d-flex  bg-light p-3" style="flex-direction: column">
     <div>

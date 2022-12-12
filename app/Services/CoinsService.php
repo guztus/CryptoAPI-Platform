@@ -12,8 +12,8 @@ class CoinsService
 
     public function __construct()
     {
-        $this->coinsRepository = new OtherServiceCryptoCoinsRepository();
-//        $this->coinsRepository = new CoinMarketCapCryptoCoinsRepository();
+//        $this->coinsRepository = new OtherServiceCryptoCoinsRepository();
+        $this->coinsRepository = new CoinMarketCapCryptoCoinsRepository();
     }
 
     public function execute(?string $coinSymbol = null)

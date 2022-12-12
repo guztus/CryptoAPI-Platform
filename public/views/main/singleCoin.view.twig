@@ -34,9 +34,11 @@
 
 {% include 'navBar/navBar.view.twig' %}
 <div class="container mt-5 d-flex flex-column">
+    {% if auth %}
     <div>
         <h3>FIAT balance: {{ auth.fiatBalance|number_format(2, '.', ',') }}</h3>
     </div>
+    {% endif %}
 
     {% for error in errors.transaction %}
         <div class="alert alert-danger" role="alert">
