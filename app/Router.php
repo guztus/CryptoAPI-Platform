@@ -8,11 +8,12 @@ use App\Controllers\LogoutController;
 use App\Controllers\PortfolioController;
 use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
+use DI\Container;
 use FastRoute;
 
 class Router
 {
-    public static function route()
+    public static function route(Container $container)
     {
         $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $router) {
             $router->addRoute('GET', '/', [CoinsController::class, 'index']);
@@ -58,7 +59,8 @@ class Router
 
                 $twig = (new TwigLoader())->getTwig();
 
-                $response = (new $controller)->{$method}();
+                $response = $container->get($controller)->{$method}();
+
                 if ($response instanceof Template) {
                     echo $twig->render($response->getPath(), $response->getParameters());
 

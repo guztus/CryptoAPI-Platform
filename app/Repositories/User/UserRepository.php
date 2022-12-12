@@ -9,7 +9,6 @@ class UserRepository
 {
     public function getUserData(?int $id = null, ?string $email = null): ?User
     {
-
         if ($id !== null) {
             return $this->getUserById($id);
         }

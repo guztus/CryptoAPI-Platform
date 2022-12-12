@@ -2,13 +2,23 @@
 
 namespace App;
 
+use App\Models\Transaction;
+use App\Repositories\Coins\CoinsRepository;
 use App\Repositories\User\UserAssetsRepository;
 use App\Services\CoinsService;
 use App\Services\User\UserAssetsService;
 use App\Services\User\UserService;
+use App\Services\User\UserTransactionHistoryService;
 
 class Validator
 {
+    private ?CoinsRepository $coinsRepository;
+
+    public function __construct(?CoinsRepository $coinsRepository = null)
+    {
+        $this->coinsRepository = $coinsRepository;
+    }
+
     public static function passed(): bool
     {
         return empty($_SESSION['errors']);
@@ -37,7 +47,7 @@ class Validator
             return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
 
-        $currentCoinPrice = ((new CoinsService())->execute($symbol))->getPrice();
+        $currentCoinPrice = ((new CoinsService($this->coinsRepository))->execute($symbol))->getPrice();
         $currentUser = (new UserService())->getUserData($userId);
         $userFiatBalance = $currentUser->getFiatBalance();
 
@@ -55,11 +65,22 @@ class Validator
         }
 
         $assetAmount = $fiatAmount / $currentCoinPrice;
-
         $dollarCostAverage = $fiatAmount / $assetAmount;
 
-        (new UserAssetsRepository())->modifyAssets($currentUser->getId(), $symbol, $assetAmount, $dollarCostAverage, $transactionType);
+
+        (new UserAssetsService())->modifyAssets($currentUser->getId(), $symbol, $assetAmount, $dollarCostAverage, $transactionType);
         (new UserService())->modifyFiatBalance($currentUser->getId(), (float)$fiatAmount, $transactionType);
+        (new UserTransactionHistoryService())->addTransaction(
+            new Transaction(
+                $currentUser->getId(),
+                $transactionType,
+                $symbol,
+                $assetAmount,
+                $currentCoinPrice,
+                (float)$fiatAmount,
+                date('Y-m-d H:i:s')
+            )
+        );
 
         $_SESSION['alerts']['transaction'] [] = ucfirst($transactionType) . " order successful: $assetAmount $symbol for $fiatAmount USD!";
 

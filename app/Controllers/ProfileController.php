@@ -2,8 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Models\Transaction;
 use App\Redirect;
 use App\Services\User\UserService;
+use App\Services\User\UserTransactionHistoryService;
 use App\Template;
 
 class ProfileController
@@ -21,6 +23,10 @@ class ProfileController
         if (empty($_SESSION['auth_id'])) {
             return Redirect::to('/login');
         }
+
+        (new UserTransactionHistoryService())->addTransaction(
+            new Transaction($_SESSION['auth_id'], $_POST['transactionType'], '$', null, null, (float)$_POST['fiatAmount'], date('Y-m-d H:i:s'))
+        );
 
         (new UserService())->modifyFiatBalance(
             (int)$_SESSION['auth_id'],

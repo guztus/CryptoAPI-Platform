@@ -3,17 +3,14 @@
 namespace App\Services;
 
 use App\Repositories\Coins\CoinsRepository;
-use App\Repositories\Coins\CoinMarketCapCryptoCoinsRepository;
-use App\Repositories\Coins\OtherServiceCryptoCoinsRepository;
 
 class CoinsService
 {
     private CoinsRepository $coinsRepository;
 
-    public function __construct()
+    public function __construct(CoinsRepository $coinsRepository)
     {
-//        $this->coinsRepository = new OtherServiceCryptoCoinsRepository();
-        $this->coinsRepository = new CoinMarketCapCryptoCoinsRepository();
+        $this->coinsRepository = $coinsRepository;
     }
 
     public function execute(?string $coinSymbol = null)

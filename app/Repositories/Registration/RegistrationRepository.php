@@ -6,7 +6,7 @@ use App\Database;
 
 class RegistrationRepository
 {
-    public function save(string $name, string $email, string $password)
+    public function save(string $name, string $email, string $password): void
     {
         $query = (new Database())->getConnection()->createQueryBuilder()->insert('users')->values([
             'name' => '?',

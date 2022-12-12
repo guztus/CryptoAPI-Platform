@@ -8,14 +8,21 @@ use App\Models\Collections\AssetCollection;
 
 class UserAssetsRepository
 {
+    private Database $database;
+
+    public function __construct()
+    {
+        $this->database = (new Database());
+    }
+
     public function modifyAssets(int $userId, string $symbol, float $amount, float $dollarCostAverage, string $operation): void
     {
-        $userHasThisAsset = (new Database())
+        $userHasThisAsset = ($this->database)
             ->getConnection()
             ->fetchAllAssociative('SELECT * FROM user_assets WHERE user_id = ? and symbol = ?', [$userId, $symbol]);
 
         if (empty($userHasThisAsset)) {
-            $query = (new Database())
+            $query = ($this->database)
                 ->getConnection()
                 ->createQueryBuilder()
                 ->insert('user_assets')
@@ -39,7 +46,7 @@ class UserAssetsRepository
             $oldDollarCostAverage = $this->getOldDollarCostAverage($userId, $symbol);
             $currentDollarCostAverage = ($oldDollarCostAverage + $dollarCostAverage) / 2;
 
-            $query = (new Database())
+            $query = ($this->database)
                 ->getConnection()
                 ->createQueryBuilder()
                 ->update('user_assets')
@@ -52,7 +59,7 @@ class UserAssetsRepository
 
     public function getAssetList(int $userId): AssetCollection
     {
-        $rawAssetList = (new Database())
+        $rawAssetList = ($this->database)
             ->getConnection()
             ->fetchAllAssociative('SELECT * FROM user_assets WHERE user_id = ?', [$userId]);
 
@@ -71,7 +78,7 @@ class UserAssetsRepository
 
     public function getSingleAsset(int $userId, string $symbol): ?Asset
     {
-        $rawAsset = (new Database())
+        $rawAsset = ($this->database)
             ->getConnection()
             ->fetchAssociative('SELECT * FROM user_assets WHERE user_id = ? and symbol = ?', [$userId, $symbol]);
 
@@ -87,7 +94,7 @@ class UserAssetsRepository
 
     public function getAssetAmount(int $userId, string $symbol): float
     {
-        $asset = (new Database())
+        $asset = ($this->database)
             ->getConnection()
             ->fetchAssociative('SELECT * FROM user_assets WHERE user_id = ? and symbol = ?', [$userId, $symbol]);
 
@@ -96,7 +103,7 @@ class UserAssetsRepository
 
     public function getOldDollarCostAverage(int $userId, string $symbol): ?float
     {
-        $asset = (new Database())
+        $asset = ($this->database)
             ->getConnection()
             ->fetchAssociative('SELECT average_cost FROM user_assets WHERE user_id = ? and symbol = ?', [$userId, $symbol]);
 

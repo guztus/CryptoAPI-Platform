@@ -10,4 +10,9 @@ class UserAssetsService
     {
         return (new UserAssetsRepository())->getAssetAmount($userId, $symbol);
     }
+
+    public function modifyAssets(int $userId, string $symbol, float $amount, float $averageCost, string $transactionType): void
+    {
+        (new UserAssetsRepository())->modifyAssets($userId, $symbol, $amount, $averageCost, $transactionType);
+    }
 }

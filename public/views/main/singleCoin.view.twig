@@ -29,15 +29,36 @@
             text-align: center
         }
     </style>
+{#    <script>#}
+{#        const box = document.getElementById('box');#}
+
+{#        console.log(document.getElementById('para'));#}
+
+{#        box.setAttribute('name', 'example-name');#}
+
+{#        function changeColor(newColor) {#}
+{#            document.getElementById('box').setAttribute('name', 'example-name');#}
+{#        }#}
+{#    </script>#}
 </head>
 <body>
+
+{#<p id="para">Some text here</p>#}
+{#<button onclick="changeColor('blue');">blue</button>#}
+{#<button onclick="changeColor('red');">red</button>#}
+
+{#</div>#}
+
+{#<form method="POST">#}
+{#    <input id="box" name="test">#}
+{#</form>#}
 
 {% include 'navBar/navBar.view.twig' %}
 <div class="container mt-5 d-flex flex-column">
     {% if auth %}
-    <div>
-        <h3>FIAT balance: {{ auth.fiatBalance|number_format(2, '.', ',') }}</h3>
-    </div>
+        <div>
+            <h3>FIAT balance: {{ auth.fiatBalance|number_format(2, '.', ',') }}</h3>
+        </div>
     {% endif %}
 
     {% for error in errors.transaction %}
@@ -63,7 +84,7 @@
                 {% if coin.percentChange24h < 0 %}
                     <div style="text-align: center">
                         <a style="font-weight: bold; font-size: 1.4em">
-                            $<span class="monospace">{{ coin.price|number_format(4, '.', ',') }}</span>
+                            $<span class="monospace">{{ coin.price|number_format(6, '.', ',') }}</span>
                         </a>
                         <a>
                             <span class="monospace"
@@ -75,7 +96,7 @@
                 {% else %}
                     <div style="text-align: center">
                         <a style="font-weight: bold; font-size: 1.4em">
-                            $<span class="monospace">{{ coin.price|number_format(4, '.', ',') }}</span>
+                            $<span class="monospace">{{ coin.price|number_format(6, '.', ',') }}</span>
                         </a>
                         <a>
                             <span class="monospace"
@@ -91,7 +112,6 @@
                     <tr>
                         <th>Volume (24h):</th>
                         <td>
-                            {{ coin.volume24h|number_format(2, '.', ',') }}
                             {% if coin.volumeChange24h > 0 %}
                                 <span class="monospace"
                                       style="color: darkgreen; font-size: 0.6em; vertical-align: super">{{ coin.volumeChange24h|number_format(2, '.', ',') }}▲</span>
@@ -99,12 +119,12 @@
                                 <span class="monospace"
                                       style="color: darkred; font-size: 0.6em; vertical-align: super">{{ coin.volumeChange24h|number_format(2, '.', ',') }}▼</span>
                             {% endif %}
+                            {{ coin.volume24h|number_format(2, '.', ',') }}
                         </td>
                     </tr>
                     <tr>
                         <th>Market cap:</th>
                         <td>
-                            {{ coin.marketCap|number_format(2, '.', ',') }}
                             {% if coin.marketCapChange24h > 0 %}
                                 <span class="monospace"
                                       style="color: darkgreen; font-size: 0.6em; vertical-align: super">{{ coin.marketCapChange24h|number_format(2, '.', ',') }}▲</span>
@@ -112,6 +132,7 @@
                                 <span class="monospace"
                                       style="color: darkred; font-size: 0.6em; vertical-align: super">{{ coin.marketCapChange24h|number_format(2, '.', ',') }}▼</span>
                             {% endif %}
+                            {{ coin.marketCap|number_format(2, '.', ',') }}
                         </td>
                     </tr>
                     <tr>

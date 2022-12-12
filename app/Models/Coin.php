@@ -11,7 +11,6 @@ class Coin
     private ?float $maxSupply;
     private float $circulatingSupply;
     private float $totalSupply;
-    private int $cmcRank;
     private string $lastUpdated;
     private float $price;
     private float $volume24h;
@@ -27,7 +26,6 @@ class Coin
         ?float  $maxSupply,
         float  $circulatingSupply,
         float  $totalSupply,
-        int    $cmcRank,
         string $lastUpdated,
         float  $price,
         float  $volume24h,
@@ -44,7 +42,6 @@ class Coin
         $this->maxSupply = $maxSupply ?? null;
         $this->circulatingSupply = $circulatingSupply;
         $this->totalSupply = $totalSupply;
-        $this->cmcRank = $cmcRank;
         $this->lastUpdated = $lastUpdated;
         $this->price = $price;
         $this->volume24h = $volume24h;
@@ -86,11 +83,6 @@ class Coin
     public function getTotalSupply(): float
     {
         return $this->totalSupply;
-    }
-
-    public function getCmcRank(): int
-    {
-        return $this->cmcRank;
     }
 
     public function getLastUpdated(): string
