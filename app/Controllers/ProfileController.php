@@ -22,7 +22,11 @@ class ProfileController
             return Redirect::to('/login');
         }
 
-        (new UserService())->modifyFiatBalance((int)$_SESSION['auth_id'], (float)$_POST['fiatAmount'], $_POST['transactionType']);
+        (new UserService())->modifyFiatBalance(
+            (int)$_SESSION['auth_id'],
+            (float)$_POST['fiatAmount'],
+            $_POST['transactionType']
+        );
 
         return Redirect::to('/profile');
     }

@@ -19,7 +19,7 @@ class UserRepository
         return null;
     }
 
-    public function modifyFiatBalance(int $id, float $fiatAmount, string $operation)
+    public function modifyFiatBalance(int $id, float $fiatAmount, string $operation): void
     {
         if ($operation == 'sell' || $operation == 'deposit') {
             $operator = '+';

@@ -14,7 +14,6 @@ class CoinsController
         if (!empty($_GET['search'])) {
             $searchedCoin = (new CoinsService())->execute(strtoupper($_GET['search']));
             if ($searchedCoin) {
-//                $searchedCoin->getAmount();
                 return Template::render('/main/singleCoin.view.twig', ['coin' => $searchedCoin]);
             }
 //            $_SESSION['errors']['search'] [] = 'There is no coin with such symbol'; // cant use this because there is no REDIRECT
@@ -29,6 +28,11 @@ class CoinsController
             $_SESSION['errors']['transaction'] [] = 'You must be logged in to do transactions!';
             return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
-        return (new Validator())->transactionOrder($_SESSION['auth_id'], $_POST['symbol'], $_POST['transactionType'], $_POST['fiatAmount']);
+        return (new Validator())->transactionOrder(
+            $_SESSION['auth_id'],
+            $_POST['symbol'],
+            $_POST['transactionType'],
+            $_POST['fiatAmount']
+        );
     }
 }

@@ -20,8 +20,8 @@ class LoginController
         $validator->login($_POST['email'], $_POST['password']);
 
         if (Validator::passed()) {
-            $_SESSION['alerts']['success'] [] = 'Login successful!';
             $currentUser = (new UserService())->getUserData(null, $_POST['email']);
+            $_SESSION['alerts']['success'] [] = 'Login successful!';
 
             $_SESSION['auth_id'] = $currentUser->getId();
             return Redirect::to('/');

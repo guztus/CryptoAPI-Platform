@@ -12,6 +12,7 @@ class PortfolioService
         $assetList = (new UserAssetsRepository())->getAssetList($_SESSION['auth_id'])->getAllAssets();
 
         $updatedAssetList = new AssetCollection();
+        // adds setCurrent price to each asset for profit calculations in Portfolio view
         foreach ($assetList as $asset) {
             $assetSymbol = ((new CoinsService())->execute($asset->getSymbol()));
             if (!$assetSymbol) {

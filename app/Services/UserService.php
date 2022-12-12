@@ -12,7 +12,7 @@ class UserService
         return (new UserRepository())->getUserData($id, $email);
     }
 
-    public function modifyFiatBalance(int $id, float $fiatAmount, string $operation)
+    public function modifyFiatBalance(int $id, float $fiatAmount, string $operation): void
     {
         (new UserRepository())->modifyFiatBalance($id, $fiatAmount, $operation);
     }
