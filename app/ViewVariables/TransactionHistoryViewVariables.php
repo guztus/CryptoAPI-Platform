@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\ViewVariables;
 
@@ -16,11 +16,9 @@ class TransactionHistoryViewVariables implements ViewVariablesInterface
         if (!empty($_SESSION['auth_id'])) {
             $transactionHistory = (new UserTransactionHistoryService())->getTransactionHistory($_SESSION['auth_id']);
 
-//            echo "<pre>";
-//            var_dump($transactionHistory);die;
             if ($transactionHistory) {
                 return [
-                    'list' => $transactionHistory ?? null,
+                    'list' => $transactionHistory->all() ?? null,
                 ];
             }
         }

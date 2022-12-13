@@ -3,21 +3,23 @@
 namespace App\Repositories\User;
 
 use App\Database;
+use App\Models\Collections\TransactionCollection;
 use App\Models\Transaction;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 class UserTransactionHistoryRepository
 {
-    private Database $database;
+    private ?Connection $connection;
     private QueryBuilder $queryBuilder;
 
     public function __construct()
     {
-        $this->database = (new Database());
-        $this->queryBuilder = $this->database->getConnection()->createQueryBuilder();
+        $this->connection = (new Database())->getConnection();
+        $this->queryBuilder = $this->connection->createQueryBuilder();
     }
 
-    public function getTransactionHistory(int $userId): array
+    public function getTransactionHistory(int $userId): TransactionCollection
     {
         $queryBuilder = $this->queryBuilder;
 
@@ -28,9 +30,24 @@ class UserTransactionHistoryRepository
             ->setParameter(0, $userId)
             ->orderBy('timestamp', 'DESC');
 
-        $result = $queryBuilder->executeQuery()->fetchAllAssociative();
+        $transactionList = $queryBuilder->executeQuery()->fetchAllAssociative();
 
-        return $result;
+        $transactionCollection = new TransactionCollection();
+
+        foreach ($transactionList as $transaction) {
+            $transactionCollection->addTransaction(new Transaction(
+                $transaction['id'],
+                $transaction['user_id'],
+                $transaction['transaction_type'],
+                $transaction['symbol'],
+                $transaction['amount'],
+                $transaction['price'],
+                $transaction['order_sum'],
+                $transaction['timestamp']
+            ));
+        }
+
+        return $transactionCollection;
     }
 
     public function addTransaction(Transaction $transaction): void

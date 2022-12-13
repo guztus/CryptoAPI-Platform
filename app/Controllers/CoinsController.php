@@ -4,11 +4,9 @@ namespace App\Controllers;
 
 use App\Redirect;
 use App\Repositories\Coins\CoinsRepository;
-use App\Repositories\Coins\CryptoAPIPlatformCryptoCoinTable;
 use App\Services\CoinsService;
 use App\Template;
 use App\Validator;
-use http\Env\Request;
 
 class CoinsController
 {
@@ -26,7 +24,8 @@ class CoinsController
             if ($searchedCoin) {
                 return Template::render('/main/singleCoin.view.twig', ['coin' => $searchedCoin]);
             }
-//            $_SESSION['errors']['search'] [] = 'There is no coin with such symbol'; // cant use this because there is no REDIRECT
+//            $_SESSION['errors']['search'] [] =
+//                'There is no coin with such symbol'; // cant use this because there is no REDIRECT
         }
         $coinList = ((new CoinsService($this->coinsRepository))->execute())->getAllCoins();
         return Template::render('/main/coinList.view.twig', ['coins' => $coinList]);
@@ -34,10 +33,9 @@ class CoinsController
 
     public function doTransaction(): Redirect
     {
-        var_dump($_POST);
-        die;
         if (!$_SESSION['auth_id']) {
-            $_SESSION['errors']['transaction'] [] = 'You must be logged in to do transactions!';
+            $_SESSION['errors']['transaction'] [] =
+                'You must be logged in to do transactions!';
             return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
 

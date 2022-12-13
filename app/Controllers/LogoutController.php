@@ -8,7 +8,7 @@ class LogoutController
 {
     public function logout(): Redirect
     {
-        session_destroy();
+        unset($_SESSION['auth_id']);
         return Redirect::to('/');
     }
 }

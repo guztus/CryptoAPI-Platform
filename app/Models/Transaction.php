@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 class Transaction
 {
+    private ?int $id;
     private int $userId;
     private string $transactionType;
     private string $symbol;
@@ -13,14 +14,16 @@ class Transaction
     private string $timeStamp;
 
     public function __construct(
+        ?int   $id,
         int    $userId,
         string $transactionType,
         string $symbol,
-        ?float  $amount,
-        ?float  $price,
+        ?float $amount,
+        ?float $price,
         float  $orderSum,
         string $timeStamp)
     {
+        $this->id = $id;
         $this->userId = $userId;
         $this->transactionType = $transactionType;
         $this->symbol = $symbol;
@@ -28,6 +31,11 @@ class Transaction
         $this->price = $price;
         $this->orderSum = $orderSum;
         $this->timeStamp = $timeStamp;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getUserId(): int
@@ -40,22 +48,22 @@ class Transaction
         return $this->transactionType;
     }
 
-    public function getSymbol()
+    public function getSymbol(): string
     {
         return $this->symbol;
     }
 
-    public function getAmount()
+    public function getAmount(): ?float
     {
         return $this->amount;
     }
 
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function getOrderSum()
+    public function getOrderSum(): float
     {
         return $this->orderSum;
     }

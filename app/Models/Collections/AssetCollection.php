@@ -8,9 +8,16 @@ class AssetCollection
 {
     private array $assets = [];
 
-    public function addAssets(Asset ...$assets)
+    public function __construct(array $assets = [])
     {
-        $this->assets = array_merge($this->assets, $assets);
+        foreach ($assets as $asset) {
+            $this->addAsset($asset);
+        }
+    }
+
+    public function addAsset (Asset $asset): void
+    {
+        $this->assets [] = $asset;
     }
 
     public function getAllAssets(): array

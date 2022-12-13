@@ -6,8 +6,12 @@ use App\Repositories\Registration\RegistrationRepository;
 
 class RegistrationService
 {
-    public function execute(string $name, string $email, string $password)
+    public function execute(
+        string $name,
+        string $email,
+        string $password)
     {
-        (new RegistrationRepository())->save($name, $email, $password);
+        (new RegistrationRepository())
+            ->save($name, $email, $password);
     }
 }

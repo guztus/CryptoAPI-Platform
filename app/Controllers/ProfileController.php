@@ -25,7 +25,15 @@ class ProfileController
         }
 
         (new UserTransactionHistoryService())->addTransaction(
-            new Transaction($_SESSION['auth_id'], $_POST['transactionType'], '$', null, null, (float)$_POST['fiatAmount'], date('Y-m-d H:i:s'))
+            new Transaction(
+                null,
+                $_SESSION['auth_id'],
+                $_POST['transactionType'],
+                '$',
+                null,
+                null,
+                (float)$_POST['fiatAmount'],
+                date('Y-m-d H:i:s'))
         );
 
         (new UserService())->modifyFiatBalance(

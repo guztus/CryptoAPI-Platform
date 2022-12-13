@@ -1,30 +1,46 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Repositories\User;
 
 use App\Database;
 use App\Models\Asset;
 use App\Models\Collections\AssetCollection;
+use App\Repositories\Coins\CoinsRepository;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 
 class UserAssetsRepository
 {
-    private Database $database;
+    private ?CoinsRepository $coinsRepository;
+    private ?Connection $database;
+    private QueryBuilder $queryBuilder;
 
-    public function __construct()
+    public function __construct(?CoinsRepository $coinsRepository = null)
     {
-        $this->database = (new Database());
+        $this->coinsRepository = $coinsRepository;
+        $this->database = (new Database())->getConnection();
+        $this->queryBuilder = $this->database->createQueryBuilder();
     }
 
-    public function modifyAssets(int $userId, string $symbol, float $amount, float $dollarCostAverage, string $operation): void
+    public function modifyAssets(
+        int    $userId,
+        string $symbol,
+        float  $amount,
+        float  $dollarCostAverage,
+        string $operation
+    ): void
     {
-        $userHasThisAsset = ($this->database)
-            ->getConnection()
-            ->fetchAllAssociative('SELECT * FROM user_assets WHERE user_id = ? and symbol = ?', [$userId, $symbol]);
+        $userHasThisAsset = $this->queryBuilder
+            ->select('*')
+            ->from('user_assets')
+            ->where('user_id = ?')
+            ->andWhere('symbol = ?')
+            ->setParameter(0, $userId)
+            ->setParameter(1, $symbol)
+            ->fetchAllAssociative();
 
         if (empty($userHasThisAsset)) {
-            $query = ($this->database)
-                ->getConnection()
-                ->createQueryBuilder()
+            $query = $this->queryBuilder
                 ->insert('user_assets')
                 ->values([
                     'user_id' => '?',
@@ -37,18 +53,17 @@ class UserAssetsRepository
                 ->setParameter(2, $amount)
                 ->setParameter(3, $dollarCostAverage);
         } else {
+            $oldDollarCostAverage = $this->getOldDollarCostAverage($userId, $symbol);
+
             if ($operation == 'sell') {
                 $operator = '-';
+                $currentDollarCostAverage = $oldDollarCostAverage;
             } else {
                 $operator = '+';
+                $currentDollarCostAverage = ($oldDollarCostAverage + $dollarCostAverage) / 2;
             }
 
-            $oldDollarCostAverage = $this->getOldDollarCostAverage($userId, $symbol);
-            $currentDollarCostAverage = ($oldDollarCostAverage + $dollarCostAverage) / 2;
-
-            $query = ($this->database)
-                ->getConnection()
-                ->createQueryBuilder()
+            $query = $this->queryBuilder
                 ->update('user_assets')
                 ->set('amount', "amount $operator $amount")
                 ->set('average_cost', $currentDollarCostAverage)
@@ -59,34 +74,50 @@ class UserAssetsRepository
 
     public function getAssetList(int $userId): AssetCollection
     {
-        $rawAssetList = ($this->database)
-            ->getConnection()
-            ->fetchAllAssociative('SELECT * FROM user_assets WHERE user_id = ?', [$userId]);
+        $rawAssetList = $this->queryBuilder
+            ->select('*')
+            ->from('user_assets')
+            ->where('user_id = ?')
+            ->setParameter(0, $userId)
+            ->fetchAllAssociative();
 
-        $assets = new AssetCollection();
+        $assetList = new AssetCollection();
 
         foreach ($rawAssetList as $asset) {
-            $assets->addAssets(new Asset(
+            $assetSymbol = $this->coinsRepository->getBySymbol($asset['symbol']);
+
+            // if is not a valid symbol, skip it ...
+            if (!$assetSymbol) {
+                continue;
+            }
+
+            $assetList->addAsset(new Asset(
                 $asset['symbol'],
-                $asset['amount'],
-                $asset['average_cost']
+                (float)$asset['amount'],
+                (float)$asset['average_cost'],
+                $assetSymbol->getPrice()
             ));
         }
 
-        return $assets;
+        return $assetList;
     }
 
     public function getSingleAsset(int $userId, string $symbol): ?Asset
     {
-        $rawAsset = ($this->database)
-            ->getConnection()
-            ->fetchAssociative('SELECT * FROM user_assets WHERE user_id = ? and symbol = ?', [$userId, $symbol]);
+        $rawAsset = $this->queryBuilder
+            ->select('*')
+            ->from('user_assets')
+            ->where('user_id = ?')
+            ->andWhere('symbol = ?')
+            ->setParameter(0, $userId)
+            ->setParameter(1, $symbol)
+            ->fetchAssociative();
 
         if ($rawAsset) {
             return new Asset(
                 $rawAsset['symbol'],
-                $rawAsset['amount'],
-                $rawAsset['average_cost']
+                (float)$rawAsset['amount'],
+                (float)$rawAsset['average_cost']
             );
         }
         return null;
@@ -94,20 +125,29 @@ class UserAssetsRepository
 
     public function getAssetAmount(int $userId, string $symbol): float
     {
-        $asset = ($this->database)
-            ->getConnection()
-            ->fetchAssociative('SELECT * FROM user_assets WHERE user_id = ? and symbol = ?', [$userId, $symbol]);
+        $asset = $this->queryBuilder
+            ->select('amount')
+            ->from('user_assets')
+            ->where('user_id = ?')
+            ->andWhere('symbol = ?')
+            ->setParameter(0, $userId)
+            ->setParameter(1, $symbol)
+            ->fetchAssociative();
 
-        return $asset['amount'] ?? 0;
+        return (float)$asset['amount'] ?? 0;
     }
 
     public function getOldDollarCostAverage(int $userId, string $symbol): ?float
     {
-        $asset = ($this->database)
-            ->getConnection()
-            ->fetchAssociative('SELECT average_cost FROM user_assets WHERE user_id = ? and symbol = ?', [$userId, $symbol]);
+        $asset = $this->queryBuilder
+            ->select('average_cost')
+            ->from('user_assets')
+            ->where('user_id = ?')
+            ->andWhere('symbol = ?')
+            ->setParameter(0, $userId)
+            ->setParameter(1, $symbol)
+            ->fetchAssociative();
 
-//        var_dump($asset);die;
-        return $asset['average_cost'];
+        return (float)$asset['average_cost'];
     }
 }

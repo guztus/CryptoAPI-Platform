@@ -4,19 +4,24 @@ namespace App;
 
 use App\Models\Transaction;
 use App\Repositories\Coins\CoinsRepository;
-use App\Repositories\User\UserAssetsRepository;
 use App\Services\CoinsService;
 use App\Services\User\UserAssetsService;
 use App\Services\User\UserService;
 use App\Services\User\UserTransactionHistoryService;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 
 class Validator
 {
     private ?CoinsRepository $coinsRepository;
+    private ?Connection $connection;
+    private QueryBuilder $queryBuilder;
 
     public function __construct(?CoinsRepository $coinsRepository = null)
     {
         $this->coinsRepository = $coinsRepository;
+        $this->connection = (new Database())->getConnection();
+        $this->queryBuilder = $this->connection->createQueryBuilder();
     }
 
     public static function passed(): bool
@@ -24,24 +29,40 @@ class Validator
         return empty($_SESSION['errors']);
     }
 
-    public function register(string $email, string $password, string $passwordConfirmation): void
+    public function register(
+        string $email,
+        string $password,
+        string $passwordConfirmation
+    ): void
     {
         $this->registrationEmail($email);
         $this->passwordConfirmation($password, $passwordConfirmation);
         $this->passwordRequirements($password);
     }
 
-    public function login(string $email, string $password)
+    public function login(
+        string $email,
+        string $password)
     {
-        $user = (new Database())->getConnection()->fetchAssociative('SELECT * FROM users WHERE email = ?', [$email]);
+        $user = $this->queryBuilder->select('*')
+            ->from('users')
+            ->where('email = ?')
+            ->setParameter(0, $email)
+            ->fetchAssociative();
+
         if (!$user || !password_verify($password, $user['password'])) {
-            $_SESSION['errors']['login'] [] = 'Login failed. Please make sure that all fields are filled out correctly and try again!';
+            $_SESSION['errors']['login'] [] =
+                'Login failed. Please make sure that all fields are filled out correctly and try again!';
         }
     }
 
-    public function transactionOrder(int $userId, string $symbol, string $transactionType, string $fiatAmount): Redirect
+    public function transactionOrder(
+        int    $userId,
+        string $symbol,
+        string $transactionType,
+        string $fiatAmount
+    ): Redirect
     {
-        //        if ($fiatAmount < 0 || $fiatAmount !== (float)$fiatAmount) {
         if ($fiatAmount < 0 || !$fiatAmount) {
             $_SESSION['errors']['transaction'] [] = 'Transaction error';
             return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
@@ -58,20 +79,19 @@ class Validator
         }
 
         // if is SELL order and user does not have enough COIN balance
-        $currentAssetAmount = (new UserAssetsService())->getAssetAmount($userId, $symbol);
+        $currentAssetAmount = (new UserAssetsService($this->coinsRepository))->getAssetAmount($userId, $symbol);
         if ($transactionType == 'sell' && $fiatAmount > $currentAssetAmount * $currentCoinPrice) {
             $_SESSION['errors']['transaction'] [] = 'You do not have enough coins to sell this amount!';
             return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
 
+        // if all is ok, create transaction & modify assets
         $assetAmount = $fiatAmount / $currentCoinPrice;
         $dollarCostAverage = $fiatAmount / $assetAmount;
 
-
-        (new UserAssetsService())->modifyAssets($currentUser->getId(), $symbol, $assetAmount, $dollarCostAverage, $transactionType);
-        (new UserService())->modifyFiatBalance($currentUser->getId(), (float)$fiatAmount, $transactionType);
         (new UserTransactionHistoryService())->addTransaction(
             new Transaction(
+                null,
                 $currentUser->getId(),
                 $transactionType,
                 $symbol,
@@ -82,7 +102,22 @@ class Validator
             )
         );
 
-        $_SESSION['alerts']['transaction'] [] = ucfirst($transactionType) . " order successful: $assetAmount $symbol for $fiatAmount USD!";
+        (new UserAssetsService())->modifyAssets(
+            $currentUser->getId(),
+            $symbol,
+            $assetAmount,
+            $dollarCostAverage,
+            $transactionType
+        );
+
+        (new UserService())->modifyFiatBalance(
+            $currentUser->getId(),
+            (float)$fiatAmount,
+            $transactionType
+        );
+
+        $_SESSION['alerts']['transaction'] [] =
+            ucfirst($transactionType) . " order successful: $assetAmount $symbol for $fiatAmount USD!";
 
         return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
     }
@@ -90,12 +125,19 @@ class Validator
     private function registrationEmail(string $email)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['errors']['email'] [] = 'Email is not valid';
+            $_SESSION['errors']['email'] [] =
+                'Email is not valid';
         }
 
-        $emailCountInSystem = (new Database())->getConnection()->executeStatement('SELECT * FROM users WHERE email = ?', [$email]);
+        $emailCountInSystem = $this->queryBuilder->select('COUNT(*)')
+            ->from('users')
+            ->where('email = ?')
+            ->setParameter(0, $email)
+            ->fetchOne();
+
         if ($emailCountInSystem > 0) {
-            $_SESSION['errors']['email'] [] = 'Registration failed. Please check that all fields are filled out correctly and try again!';
+            $_SESSION['errors']['email'] [] =
+                'Registration failed. Please check that all fields are filled out correctly and try again!';
         }
     }
 
@@ -103,14 +145,16 @@ class Validator
     {
         preg_match('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,}$/', $password, $matches);
         if (empty($matches[0])) {
-            $_SESSION['errors']['password'] [] = 'Password must contain at least: 8 characters, uppercase letter, lowercase letter and number';
+            $_SESSION['errors']['password'] [] =
+                'Password must contain at least: 8 characters, uppercase letter, lowercase letter and number';
         }
     }
 
     private function passwordConfirmation(string $password, string $passwordConfirmation): void
     {
         if ($password !== $passwordConfirmation) {
-            $_SESSION['errors']['password'] [] = 'Password confirmation does not match';
+            $_SESSION['errors']['password'] [] =
+                'Password confirmation does not match';
         }
     }
 }

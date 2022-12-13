@@ -14,7 +14,7 @@ class CoinMarketCapCryptoCoinsRepository implements CoinsRepository
         $coins = new CoinCollection();
 
         foreach ($results->data as $coin) {
-            $coins->addCoins(
+            $coins->addCoin(
                 new Coin(
                     $coin->id,
                     $coin->name,

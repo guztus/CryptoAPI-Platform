@@ -8,9 +8,16 @@ class CoinCollection
 {
     private array $coins = [];
 
-    public function addCoins(Coin ...$coins)
+    public function __construct(array $coins = [])
     {
-        $this->coins = array_merge($this->coins, $coins);
+        foreach ($coins as $coin) {
+            $this->addCoin($coin);
+        }
+    }
+
+    public function addCoin (Coin $coin): void
+    {
+        $this->coins [] = $coin;
     }
 
     public function getAllCoins(): array

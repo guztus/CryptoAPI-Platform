@@ -12,7 +12,10 @@ class RegistrationRepository
             'name' => '?',
             'email' => '?',
             'password' => '?'
-        ])->setParameter(0, $name)->setParameter(1, $email)->setParameter(2, $password);
+        ])
+            ->setParameter(0, $name)
+            ->setParameter(1, $email)
+            ->setParameter(2, $password);
         $query->executeStatement();
     }
 }
