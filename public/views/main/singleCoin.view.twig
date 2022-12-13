@@ -47,20 +47,38 @@
 
             document.getElementById('input_coin_amount').value = coinAmount;
         }
-        {# function inputTesting() { #}
-        {#    let inputFiatAmount = document.getElementById('input_fiat_amount').value; #}
-        {#    let inputCoinAmount = document.getElementById('input_coin_amount').value; #}
 
-        {#    let fiatAmount = inputCoinAmount * {{ coin.price }}; #}
-        {#    let coinAmount = inputFiatAmount / {{ coin.price }}; #}
+        function coinSetMaxCoinAmount() {
+            document.getElementById('coin_amount').style.color = 'darkred';
+            document.getElementById('coin_amount').textContent = 'Max';
+        }
 
-        {#    console.log(coinAmount); // = $/price = coin amount // GREAT - when I input $ says ADA #}
-        {#    console.log(fiatAmount); // = price * coin amount = fiat amount // GREAT - when I input ADA, says $ #}
+        function coinSetDefaultText()
+        {
+            document.getElementById('coin_amount').style.color = 'black';
+            document.getElementById('coin_amount').textContent = "{{ coin.symbol }}";
+        }
 
-        {#    document.getElementById('input_fiat_amount').value = fiatAmount; #}
-        {#    document.getElementById('input_coin_amount').value = coinAmount; #}
-        {#    #}{# console.log(coinAmount * {{ coin.price }}); // coin amount * price = $ // GREAT #}
-        {# } #}
+        function coinSetMaxFiatAmount() {
+            document.getElementById('input_coin_amount').value = "{{ userAsset.amount }}";
+            fiatChangeLive();
+        }
+
+        function fiatSetMaxCoinAmount() {
+            document.getElementById('fiat_amount').style.color = 'darkred';
+            document.getElementById('fiat_amount').textContent = 'Max';
+        }
+
+        function fiatSetDefaultText()
+        {
+            document.getElementById('fiat_amount').style.color = 'black';
+            document.getElementById('fiat_amount').textContent = "$";
+        }
+
+        function fiatSetMaxFiatAmount() {
+            document.getElementById('input_fiat_amount').value = "{{ auth.fiatBalance }}";
+            amountChangeLive();
+        }
     </script>
 </head>
 <body>
@@ -194,13 +212,13 @@
                                 <input name="transactionType" value="buy" type="hidden">
                                 <div class="input-group mb-3">
                                     <input id="input_coin_amount" type="number" step="0.000000001"
-                                           class="form-control" oninput="fiatChangeLive()" min="0">
-                                    <span class="input-group-text" id=" " onmouseover="">{{ coin.symbol }}</span>
+                                           class="form-control" oninput="fiatChangeLive()" onmouseover="coinSetMaxCoinAmount()" onmouseleave="coinSetDefaultText()" min="0">
+                                    <span class="input-group-text" id="coin_amount" onmousedown="coinSetMaxFiatAmount()" onmouseenter="coinSetMaxCoinAmount()" onmouseleave="coinSetDefaultText()" >{{ coin.symbol }}</span>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <span class="input-group-text" id=" " onmouseover="">&nbsp $ &nbsp</span>
+                                    <span class="input-group-text" id="fiat_amount" onmousedown="fiatSetMaxFiatAmount()" onmouseenter="fiatSetMaxCoinAmount()" onmouseleave="fiatSetDefaultText()">&nbsp $ &nbsp</span>
                                     <input id="input_fiat_amount" type="number" name="fiatAmount" step="0.01"
-                                           class="form-control" oninput="amountChangeLive()" min="0">
+                                           class="form-control" oninput="amountChangeLive()" onmouseover="fiatSetMaxCoinAmount()" onmouseleave="fiatSetDefaultText()" min="0">
                                 </div>
                                 <div class="d-flex" style="padding-right: 4em; padding-left: 4em">
                                     <div>
