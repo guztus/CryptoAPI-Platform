@@ -11,7 +11,7 @@ session_start();
 (Dotenv\Dotenv::createImmutable('../'))->load();
 
 $container = new DI\Container();
-//$container->set(CoinsRepository::class, \DI\create(\App\Repositories\Coins\CoinMarketCapCryptoCoinsRepository::class));
-$container->set(CoinsRepository::class, \DI\create(CryptoAPIPlatformCryptoCoinTable::class));
+$container->set(CoinsRepository::class, \DI\create(\App\Repositories\Coins\CoinMarketCapCryptoCoinsRepository::class));
+//$container->set(CoinsRepository::class, \DI\create(CryptoAPIPlatformCryptoCoinTable::class));
 
 Router::route($container);

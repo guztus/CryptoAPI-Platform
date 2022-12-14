@@ -6,7 +6,7 @@ use App\Models\Transaction;
 
 class TransactionCollection
 {
-    private array $transactions;
+    private array $transactions = [];
 
     public function __construct(array $transactions = [])
     {
