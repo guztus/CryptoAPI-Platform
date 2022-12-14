@@ -80,18 +80,30 @@
     <div style="text-align: center">
         {% set assetsTotalSum = 0 %}
         {% set totalAssetCount = 0 %}
+        {% set totalProfitLoss = 0 %}
 
         {% for asset in assetList %}
             {% set assetsTotalSum = assetsTotalSum + asset.currentPrice * asset.amount %}
             {% set totalAssetCount = totalAssetCount + 1 %}
+            {#            (((asset.currentPrice-asset.averageCost)/asset.averageCost)*100)#}
+            {% set totalProfitLoss = totalProfitLoss + (((asset.currentPrice-asset.averageCost)/asset.averageCost)*100) %}
         {% endfor %}
 
         <h6>
             Asset Count: <span class="monospace orangeUnderLine">{{ totalAssetCount|number_format(0, '.', ',') }}</span>
         </h6>
-        <h6>
+        <h6 style="margin-bottom: 0.8em">
             Total Value: $ <span
                     class="monospace orangeUnderLine">{{ assetsTotalSum|number_format(2, '.', ',') }}</span>
+            {% if totalProfitLoss > 0 %}
+                <span class="text-success" style="font-size: 0.7em; font-weight: normal; vertical-align: super">
+                            +{{ totalProfitLoss|number_format(2, '.', ',') }} ▲
+                        </span>
+            {% else %}
+                <span class="text-danger" style="font-size: 0.7em; font-weight: normal; vertical-align: super">
+                            {{ totalProfitLoss|number_format(2, '.', ',') }} ▼
+                        </span>
+            {% endif %}
         </h6>
         <h6>
             FIAT Balance: $ <span
@@ -104,11 +116,12 @@
         <thead>
         <tr>
             <th class="centered">Symbol</th>
-            <th>Current Price</th>
+            <th cols>Current Price</th>
             <th>Average Cost</th>
             <th>Amount</th>
             <th>$ Amount</th>
             <th>% Profit/Loss</th>
+            <th>$ Profit/Loss</th>
         </tr>
         </thead>
         <tbody>
@@ -131,6 +144,17 @@
                     {% else %}
                         <span class="text-danger">
                             {{ (((asset.currentPrice-asset.averageCost)/asset.averageCost)*100)|number_format(2, '.', ',') }} ▼
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if asset.currentPrice > asset.averageCost %}
+                        <span class="text-success">
+                            +${{ ((asset.currentPrice-asset.averageCost)*asset.amount)|number_format(2, '.', ',') }}
+                        </span>
+                    {% else %}
+                        <span class="text-danger">
+                            -${{ ((asset.averageCost-asset.currentPrice)*asset.amount)|number_format(2, '.', ',') }}
                         </span>
                     {% endif %}
                 </td>
