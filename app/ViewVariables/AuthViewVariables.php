@@ -2,7 +2,7 @@
 
 namespace App\ViewVariables;
 
-use App\Services\User\UserService;
+use App\Services\User\UserGetInformationService;
 
 class AuthViewVariables implements ViewVariablesInterface
 {
@@ -14,7 +14,7 @@ class AuthViewVariables implements ViewVariablesInterface
     public function getValue(): array
     {
         if (!empty($_SESSION['auth_id'])) {
-            $currentUser = (new UserService())->getUserData($_SESSION['auth_id']);
+            $currentUser = (new UserGetInformationService())->execute($_SESSION['auth_id']);
             return [
                 'id' => $currentUser->getId() ?? null,
                 'email' => $currentUser->getEmail() ?? null,

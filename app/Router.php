@@ -8,6 +8,7 @@ use App\Controllers\LogoutController;
 use App\Controllers\PortfolioController;
 use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
+use App\Controllers\ViewProfileController;
 use DI\Container;
 use FastRoute;
 
@@ -26,6 +27,8 @@ class Router
             $router->addRoute('GET', '/profile', [ProfileController::class, 'showForm']);
             $router->addRoute('POST', '/profile', [ProfileController::class, 'update']);
             $router->addRoute('GET', '/portfolio', [PortfolioController::class, 'index']);
+            $router->addRoute('GET', '/profile/{id:\d+}', [ViewProfileController::class, 'show']);
+            $router->addRoute('POST', '/profile/{id:\d+}', [ViewProfileController::class, 'sendCoins']);
         });
 
 // Fetch method and URI from somewhere
@@ -51,13 +54,13 @@ class Router
                 break;
             case FastRoute\Dispatcher::FOUND:
                 $handler = $routeInfo[1];
-//                $vars = $routeInfo[2];
+                $vars = $routeInfo[2];
 
                 [$controller, $method] = $handler;
 
                 $twig = (new TwigLoader())->getTwig();
 
-                $response = $container->get($controller)->{$method}();
+                $response = $container->get($controller)->{$method}($vars);
 
                 if ($response instanceof Template) {
                     echo $twig->render($response->getPath(), $response->getParameters());

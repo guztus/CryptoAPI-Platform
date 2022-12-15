@@ -6,6 +6,8 @@ use App\Database;
 use App\Models\Asset;
 use App\Models\Collections\AssetCollection;
 use App\Repositories\Coins\CoinsRepository;
+use App\Services\CoinsService;
+use App\Services\User\UserGetInformationService;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
@@ -26,10 +28,16 @@ class UserAssetsRepository
         int    $userId,
         string $symbol,
         float  $amount,
-        float  $dollarCostAverage,
-        string $operation
+        string $operation,
+        ?float $price,
+        ?float $oldDollarCostAverage,
+        ?float $purchaseDollarCostAverage
+        // PRICE null when DEPOSIT / WITHDRAW / SEND
+        // DOLLAR COST AVERAGE null when DEPOSIT / WITHDRAW / SEND
+        // OLD DOLLAR COST AVERAGE null when buy & no assets
     ): void
     {
+        // check if user has any assets of this type
         $userHasThisAsset = $this->queryBuilder
             ->select('*')
             ->from('user_assets')
@@ -37,8 +45,9 @@ class UserAssetsRepository
             ->andWhere('symbol = ?')
             ->setParameter(0, $userId)
             ->setParameter(1, $symbol)
-            ->fetchAllAssociative();
+            ->fetchAssociative();
 
+        // if they don't, create a new asset
         if (empty($userHasThisAsset)) {
             $query = $this->queryBuilder
                 ->insert('user_assets')
@@ -51,28 +60,32 @@ class UserAssetsRepository
                 ->setParameter(0, $userId)
                 ->setParameter(1, $symbol)
                 ->setParameter(2, $amount)
-                ->setParameter(3, $dollarCostAverage);
+                ->setParameter(3, $price);
         } else {
-            $oldDollarCostAverage = $this->getOldDollarCostAverage($userId, $symbol);
 
-            if ($operation == 'sell') {
+            if ($operation === 'sell' || $operation === 'send') {
+                var_dump('sell');
                 $operator = '-';
-                $currentDollarCostAverage = $oldDollarCostAverage;
+                $newDollarCostAverage = $oldDollarCostAverage;
             } else {
                 $operator = '+';
-                $currentDollarCostAverage = ($oldDollarCostAverage + $dollarCostAverage) / 2;
+                $newDollarCostAverage = ($oldDollarCostAverage + $purchaseDollarCostAverage) / 2;
             }
+
+//            var_dump($purchaseDollarCostAverage);
+//            var_dump($oldDollarCostAverage);
+//            var_dump($newDollarCostAverage);die;
 
             $query = $this->queryBuilder
                 ->update('user_assets')
                 ->set('amount', "amount $operator $amount")
-                ->set('average_cost', $currentDollarCostAverage)
+                ->set('average_cost', $newDollarCostAverage)
                 ->where("user_id = $userId", "symbol = '$symbol'");
         }
         $query->executeStatement();
     }
 
-    public function getAssetList(int $userId): AssetCollection
+    public function getAssetList(int $userId): ?AssetCollection
     {
         $rawAssetList = $this->queryBuilder
             ->select('*')
@@ -80,6 +93,10 @@ class UserAssetsRepository
             ->where('user_id = ?')
             ->setParameter(0, $userId)
             ->fetchAllAssociative();
+
+        if (empty($rawAssetList)) {
+            return null;
+        }
 
         $assetList = new AssetCollection();
 
@@ -147,6 +164,10 @@ class UserAssetsRepository
             ->setParameter(0, $userId)
             ->setParameter(1, $symbol)
             ->fetchAssociative();
+
+        if (is_null($asset['average_cost'])) {
+            return null;
+        }
 
         return (float)$asset['average_cost'];
     }

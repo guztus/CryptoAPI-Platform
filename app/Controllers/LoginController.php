@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Redirect;
-use App\Services\User\UserService;
+use App\Services\User\UserGetInformationService;
 use App\Template;
 use App\Validator;
 
@@ -20,9 +20,9 @@ class LoginController
         $validator->login($_POST['email'], $_POST['password']);
 
         if (Validator::passed()) {
-            $currentUser = (new UserService())->getUserData(null, $_POST['email']);
-            $_SESSION['alerts']['success'] [] = 'Login successful!';
+            $currentUser = (new UserGetInformationService())->execute(null, $_POST['email']);
 
+            $_SESSION['alerts']['success'] [] = 'Login successful!';
             $_SESSION['auth_id'] = $currentUser->getId();
             return Redirect::to('/');
         }

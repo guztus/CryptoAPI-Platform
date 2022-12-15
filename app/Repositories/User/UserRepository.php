@@ -67,12 +67,17 @@ class UserRepository
             ->setParameter(0, $id)
             ->fetchAssociative();
 
+        if (!$user) {
+            return null;
+        }
+
         return new User(
             (int)$user['id'],
             $user['name'],
             $user['email'],
             $user['password'],
-            (float)$user['fiat_balance']
+            (float)$user['fiat_balance'],
+            $user['registration_time']
         );
     }
 
@@ -90,12 +95,14 @@ class UserRepository
         if (!$user) {
             return null;
         }
+
         return new User(
             (int)$user['id'],
             $user['name'],
             $user['email'],
             $user['password'],
-            (float)$user['fiat_balance']
+            (float)$user['fiat_balance'],
+            $user['registration_time']
         );
     }
 }

@@ -16,8 +16,6 @@ class UserAssetsViewVariables implements ViewVariablesInterface
         if (!empty($_SESSION['auth_id']) && !empty($_GET['search'])) {
             $asset = (new UserAssetsRepository())->getSingleAsset($_SESSION['auth_id'], $_GET['search']);
 
-//            var_dump($asset);die;
-
             if ($asset) {
                 return [
                     'amount' => $asset->getAmount() ?? null,

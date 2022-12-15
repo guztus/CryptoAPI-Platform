@@ -4,24 +4,27 @@ namespace App\Models;
 
 class Transaction
 {
-    private ?int $id;
+    private int $id;
     private int $userId;
     private string $transactionType;
     private string $symbol;
     private ?float $amount;
     private ?float $price;
-    private float $orderSum;
+    private ?float $orderSum;
     private string $timeStamp;
+    private ?int $databaseId;
 
     public function __construct(
-        ?int   $id,
+        int   $id,
         int    $userId,
         string $transactionType,
         string $symbol,
         ?float $amount,
         ?float $price,
-        float  $orderSum,
-        string $timeStamp)
+        ?float $orderSum,
+        string $timeStamp,
+        ?int   $databaseId = null
+    )
     {
         $this->id = $id;
         $this->userId = $userId;
@@ -31,6 +34,7 @@ class Transaction
         $this->price = $price;
         $this->orderSum = $orderSum;
         $this->timeStamp = $timeStamp;
+        $this->databaseId = $databaseId;
     }
 
     public function getId(): int
@@ -63,7 +67,7 @@ class Transaction
         return $this->price;
     }
 
-    public function getOrderSum(): float
+    public function getOrderSum(): ?float
     {
         return $this->orderSum;
     }
@@ -71,5 +75,10 @@ class Transaction
     public function getTimeStamp(): string
     {
         return $this->timeStamp;
+    }
+
+    public function getDatabaseId(): ?int
+    {
+        return $this->databaseId;
     }
 }

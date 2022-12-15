@@ -2,12 +2,11 @@
 
 namespace App;
 
-use App\Models\Transaction;
 use App\Repositories\Coins\CoinsRepository;
+use App\Repositories\User\UserAssetsRepository;
 use App\Services\CoinsService;
-use App\Services\User\UserAssetsService;
-use App\Services\User\UserService;
-use App\Services\User\UserTransactionHistoryService;
+use App\Services\User\Transaction\UserDoTransactionService;
+use App\Services\User\UserGetInformationService;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
@@ -42,7 +41,8 @@ class Validator
 
     public function login(
         string $email,
-        string $password)
+        string $password
+    ): void
     {
         $user = $this->queryBuilder->select('*')
             ->from('users')
@@ -69,7 +69,7 @@ class Validator
         }
 
         $currentCoinPrice = ((new CoinsService($this->coinsRepository))->execute($symbol))->getPrice();
-        $currentUser = (new UserService())->getUserData($userId);
+        $currentUser = (new UserGetInformationService())->execute($userId);
         $userFiatBalance = $currentUser->getFiatBalance();
 
         // if is BUY order and user does not have enough FIAT balance
@@ -79,7 +79,7 @@ class Validator
         }
 
         // if is SELL order and user does not have enough COIN balance
-        $currentAssetAmount = (new UserAssetsService($this->coinsRepository))->getAssetAmount($userId, $symbol);
+        $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol);
         if ($transactionType == 'sell' && $fiatAmount > $currentAssetAmount * $currentCoinPrice) {
             $_SESSION['errors']['transaction'] [] = 'You do not have enough coins to sell this amount!';
             return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
@@ -87,33 +87,14 @@ class Validator
 
         // if all is ok, create transaction & modify assets
         $assetAmount = $fiatAmount / $currentCoinPrice;
-        $dollarCostAverage = $fiatAmount / $assetAmount;
 
-        (new UserTransactionHistoryService())->addTransaction(
-            new Transaction(
-                null,
+        (new UserDoTransactionService())->execute(
                 $currentUser->getId(),
                 $transactionType,
                 $symbol,
                 $assetAmount,
                 $currentCoinPrice,
                 (float)$fiatAmount,
-                date('Y-m-d H:i:s')
-            )
-        );
-
-        (new UserAssetsService())->modifyAssets(
-            $currentUser->getId(),
-            $symbol,
-            $assetAmount,
-            $dollarCostAverage,
-            $transactionType
-        );
-
-        (new UserService())->modifyFiatBalance(
-            $currentUser->getId(),
-            (float)$fiatAmount,
-            $transactionType
         );
 
         $_SESSION['alerts']['transaction'] [] =

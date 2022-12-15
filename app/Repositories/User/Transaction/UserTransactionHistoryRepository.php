@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\User;
+namespace App\Repositories\User\Transaction;
 
 use App\Database;
 use App\Models\Collections\TransactionCollection;
@@ -36,9 +36,9 @@ class UserTransactionHistoryRepository
 
         foreach ($transactionList as $transaction) {
             $transactionCollection->addTransaction(new Transaction(
-                $transaction['id'],
+                $transaction['extra_unique_id'],
                 $transaction['user_id'],
-                $transaction['transaction_type'],
+                $transaction['type'],
                 $transaction['symbol'],
                 $transaction['amount'],
                 $transaction['price'],
@@ -57,21 +57,23 @@ class UserTransactionHistoryRepository
         $queryBuilder
             ->insert('transaction_history')
             ->values([
+                'extra_unique_id' => '?',
                 'user_id' => '?',
-                'transaction_type' => '?',
+                'type' => '?',
                 'symbol' => '?',
                 'amount' => '?',
                 'price' => '?',
                 'order_sum' => '?',
                 'timestamp' => '?'
             ])
-            ->setParameter(0, $transaction->getUserId())
-            ->setParameter(1, $transaction->getTransactionType())
-            ->setParameter(2, $transaction->getSymbol())
-            ->setParameter(3, $transaction->getAmount())
-            ->setParameter(4, $transaction->getPrice())
-            ->setParameter(5, $transaction->getOrderSum())
-            ->setParameter(6, $transaction->getTimestamp());
+            ->setParameter(0, $transaction->getId())
+            ->setParameter(1, $transaction->getUserId())
+            ->setParameter(2, $transaction->getTransactionType())
+            ->setParameter(3, $transaction->getSymbol())
+            ->setParameter(4, $transaction->getAmount())
+            ->setParameter(5, $transaction->getPrice())
+            ->setParameter(6, $transaction->getOrderSum())
+            ->setParameter(7, $transaction->getTimestamp());
 
         $queryBuilder->executeQuery();
     }

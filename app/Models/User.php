@@ -9,14 +9,16 @@ class User
     private string $email;
     private string $password;
     private float $fiatBalance;
+    private string $registrationTime;
 
-    public function __construct(?int $id, string $name, string $email, string $password, float $fiatBalance)
+    public function __construct(?int $id, string $name, string $email, string $password, float $fiatBalance, string $registrationTime = null)
     {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
         $this->fiatBalance = $fiatBalance;
+        $this->registrationTime = $registrationTime;
     }
 
     public function getId(): ?int
@@ -42,5 +44,10 @@ class User
     public function getFiatBalance(): float
     {
         return $this->fiatBalance;
+    }
+
+    public function getRegistrationTime(): string
+    {
+        return $this->registrationTime;
     }
 }

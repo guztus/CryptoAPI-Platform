@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services\User;
+namespace App\Services\User\Assets;
 
 use App\Models\Collections\AssetCollection;
 use App\Repositories\Coins\CoinsRepository;
 use App\Repositories\User\UserAssetsRepository;
 
-class PortfolioService
+class UserAssetsListService
 {
     private CoinsRepository $coinsRepository;
 
@@ -15,9 +15,9 @@ class PortfolioService
         $this->coinsRepository = $coinsRepository;
     }
 
-    public function execute(): AssetCollection
+    public function execute(int $id): ?AssetCollection
     {
         return (new UserAssetsRepository($this->coinsRepository))
-            ->getAssetList($_SESSION['auth_id']);
+            ->getAssetList($id);
     }
 }
