@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
 use App\Repositories\Coins\CoinsRepository;
-use App\Repositories\Coins\CryptoAPIPlatformCryptoCoinTable;
+use App\Repositories\Coins\CryptoCoinTable;
 use App\Router;
+use App\UserActions;
 
 require_once '../vendor/autoload.php';
 
@@ -12,6 +13,8 @@ session_start();
 
 $container = new DI\Container();
 //$container->set(CoinsRepository::class, \DI\create(\App\Repositories\Coins\CoinMarketCapCryptoCoinsRepository::class));
-$container->set(CoinsRepository::class, \DI\create(CryptoAPIPlatformCryptoCoinTable::class));
+$container->set(CoinsRepository::class, \DI\create(CryptoCoinTable::class));
+
+//$container->set(UserActions::class, \DI\create(UserActions::class));
 
 Router::route($container);

@@ -2,13 +2,20 @@
 
 namespace App\Controllers;
 
-use App\Models\Transaction;
 use App\Redirect;
+use App\Repositories\Coins\CoinsRepository;
 use App\Services\User\Transaction\UserDoTransactionService;
 use App\Template;
 
 class ProfileController
 {
+    private CoinsRepository $coinsRepository;
+
+    public function __construct(CoinsRepository $coinsRepository)
+    {
+        $this->coinsRepository = $coinsRepository;
+    }
+
     public function showForm()
     {
         if (empty($_SESSION['auth_id'])) {
@@ -23,13 +30,12 @@ class ProfileController
             return Redirect::to('/login');
         }
 
-        (new UserDoTransactionService())->execute(
-                $_SESSION['auth_id'],
-                $_POST['transactionType'],
-                '$',
-                null,
-                null,
-                (float)$_POST['fiatAmount'],
+        (new UserDoTransactionService($this->coinsRepository))->execute(
+            (int)$_SESSION['auth_id'],
+            $_POST['transactionType'],
+            '$',
+            (float)$_POST['fiatAmount'],
+            null,
         );
 
         return Redirect::to('/profile');

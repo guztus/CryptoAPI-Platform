@@ -6,7 +6,7 @@ use App\Database;
 use App\Models\Coin;
 use App\Models\Collections\CoinCollection;
 
-class CryptoAPIPlatformCryptoCoinTable implements CoinsRepository
+class CryptoCoinTable implements CoinsRepository
 {
     public function getList(): CoinCollection
     {

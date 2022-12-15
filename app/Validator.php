@@ -4,9 +4,6 @@ namespace App;
 
 use App\Repositories\Coins\CoinsRepository;
 use App\Repositories\User\UserAssetsRepository;
-use App\Services\CoinsService;
-use App\Services\User\Transaction\UserDoTransactionService;
-use App\Services\User\UserGetInformationService;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
@@ -56,51 +53,36 @@ class Validator
         }
     }
 
-    public function transactionOrder(
+    public function buySellTransaction(
         int    $userId,
-        string $symbol,
         string $transactionType,
-        string $fiatAmount
-    ): Redirect
+        string $symbol,
+        float  $fiatAmount,
+        float  $currentCoinPrice,
+        float $userFiatBalance
+    )
     {
-        if ($fiatAmount < 0 || !$fiatAmount) {
-            $_SESSION['errors']['transaction'] [] = 'Transaction error';
-            return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-        }
-
-        $currentCoinPrice = ((new CoinsService($this->coinsRepository))->execute($symbol))->getPrice();
-        $currentUser = (new UserGetInformationService())->execute($userId);
-        $userFiatBalance = $currentUser->getFiatBalance();
-
-        // if is BUY order and user does not have enough FIAT balance
-        if ($transactionType == 'buy' && $fiatAmount > $userFiatBalance) {
-            $_SESSION['errors']['transaction'] [] = 'You do not have enough money to buy this amount of coins!';
-            return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-        }
-
+        $this->transactionValue($fiatAmount);
         // if is SELL order and user does not have enough COIN balance
         $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol);
         if ($transactionType == 'sell' && $fiatAmount > $currentAssetAmount * $currentCoinPrice) {
             $_SESSION['errors']['transaction'] [] = 'You do not have enough coins to sell this amount!';
-            return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
 
-        // if all is ok, create transaction & modify assets
-        $assetAmount = $fiatAmount / $currentCoinPrice;
+        $this->transactionValue($fiatAmount);
+        // if is BUY order and user does not have enough FIAT balance
+        if ($transactionType == 'buy' && $fiatAmount > $userFiatBalance) {
+            $_SESSION['errors']['transaction'] [] = 'You do not have enough money to buy this amount of coins!';
+        }
+    }
 
-        (new UserDoTransactionService())->execute(
-                $currentUser->getId(),
-                $transactionType,
-                $symbol,
-                $assetAmount,
-                $currentCoinPrice,
-                (float)$fiatAmount,
-        );
-
-        $_SESSION['alerts']['transaction'] [] =
-            ucfirst($transactionType) . " order successful: $assetAmount $symbol for $fiatAmount USD!";
-
-        return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
+    private function transactionValue(
+        $fiatAmount
+    )
+    {
+        if ($fiatAmount < 0 || !$fiatAmount) {
+            $_SESSION['errors']['transaction'] [] = 'Transaction error';
+        }
     }
 
     private function registrationEmail(string $email)

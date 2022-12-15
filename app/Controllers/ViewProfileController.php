@@ -58,21 +58,20 @@ class ViewProfileController
 //        send coins
 //        redirect to profile
 
-        (new UserDoTransactionService())->execute(
+        (new UserDoTransactionService($this->coinsRepository))->execute(
             $_SESSION['auth_id'],
             'send',
             $_POST['symbol'],
+            null,
             $_POST['coinAmount'],
-            null,
-            null,
         );
-        (new UserDoTransactionService())->execute(
+
+        (new UserDoTransactionService($this->coinsRepository))->execute(
             $_POST['receivingUserId'],
             'receive',
             $_POST['symbol'],
+            null,
             $_POST['coinAmount'],
-            null,
-            null,
         );
 
         return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");

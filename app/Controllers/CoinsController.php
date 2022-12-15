@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Redirect;
 use App\Repositories\Coins\CoinsRepository;
 use App\Services\CoinsService;
+use App\Services\User\Transaction\UserDoTransactionService;
 use App\Template;
 use App\Validator;
 
@@ -39,11 +40,20 @@ class CoinsController
             return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
         }
 
-        return (new Validator($this->coinsRepository))->transactionOrder(
-            $_SESSION['auth_id'],
-            $_POST['symbol'],
+        (new UserDoTransactionService($this->coinsRepository))->execute(
+            (int)$_SESSION['auth_id'],
             $_POST['transactionType'],
-            $_POST['fiatAmount']
+            $_POST['symbol'],
+            (float)$_POST['fiatAmount'],
+            null
         );
+
+        return Redirect::to("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
+//        return (new Validator($this->coinsRepository))->transactionOrder(
+//            $_SESSION['auth_id'],
+//            $_POST['symbol'],
+//            $_POST['transactionType'],
+//            $_POST['fiatAmount']
+//        );
     }
 }

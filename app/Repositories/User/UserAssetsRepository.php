@@ -26,9 +26,9 @@ class UserAssetsRepository
 
     public function modifyAssets(
         int    $userId,
+        string $operation,
         string $symbol,
         float  $amount,
-        string $operation,
         ?float $price,
         ?float $oldDollarCostAverage,
         ?float $purchaseDollarCostAverage
@@ -61,10 +61,10 @@ class UserAssetsRepository
                 ->setParameter(1, $symbol)
                 ->setParameter(2, $amount)
                 ->setParameter(3, $price);
+            $query->executeQuery();
         } else {
 
             if ($operation === 'sell' || $operation === 'send') {
-                var_dump('sell');
                 $operator = '-';
                 $newDollarCostAverage = $oldDollarCostAverage;
             } else {
@@ -72,17 +72,19 @@ class UserAssetsRepository
                 $newDollarCostAverage = ($oldDollarCostAverage + $purchaseDollarCostAverage) / 2;
             }
 
-//            var_dump($purchaseDollarCostAverage);
-//            var_dump($oldDollarCostAverage);
-//            var_dump($newDollarCostAverage);die;
 
-            $query = $this->queryBuilder
-                ->update('user_assets')
-                ->set('amount', "amount $operator $amount")
-                ->set('average_cost', $newDollarCostAverage)
-                ->where("user_id = $userId", "symbol = '$symbol'");
+            $sql = "UPDATE user_assets SET amount = amount $operator '$amount' WHERE user_id = '$userId' AND symbol = '$symbol'";
+            $this->database->query($sql);
+
+//            $query = $this->queryBuilder
+//                ->update('user_assets')
+//                ->set('amount', "amount $operator $amount")
+//                ->set('average_cost', $newDollarCostAverage)
+//                ->where('user_id = ?', 'symbol = ?')
+//                ->setParameter(0, $userId)
+//                ->setParameter(1, $symbol);
+//            $query->executeQuery();
         }
-        $query->executeStatement();
     }
 
     public function getAssetList(int $userId): ?AssetCollection
