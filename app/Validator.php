@@ -9,13 +9,11 @@ use Doctrine\DBAL\Query\QueryBuilder;
 
 class Validator
 {
-    private ?CoinsRepository $coinsRepository;
     private ?Connection $connection;
     private QueryBuilder $queryBuilder;
 
-    public function __construct(?CoinsRepository $coinsRepository = null)
+    public function __construct()
     {
-        $this->coinsRepository = $coinsRepository;
         $this->connection = (new Database())->getConnection();
         $this->queryBuilder = $this->connection->createQueryBuilder();
     }

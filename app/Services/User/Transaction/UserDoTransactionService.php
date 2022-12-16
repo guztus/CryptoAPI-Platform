@@ -27,8 +27,8 @@ class UserDoTransactionService
         string $symbol,
         ?float $fiatAmount,
         ?float $assetAmount
-        // AMOUNT null when DEPOSIT / WITHDRAW
-        // PRICE & FIAT AMOUNT null when SEND
+        // ASSET AMOUNT  null when DEPOSIT / WITHDRAW
+        // FIAT AMOUNT   null when SEND
     ): void
     {
         if ($transactionType === 'buy' || $transactionType === 'sell') {
