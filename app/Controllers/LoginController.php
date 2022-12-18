@@ -21,7 +21,6 @@ class LoginController
 
         if (Validator::passed()) {
             $currentUser = (new UserGetInformationService())->execute(null, $_POST['email']);
-
             $_SESSION['alerts']['success'] [] = 'Login successful!';
             $_SESSION['auth_id'] = $currentUser->getId();
             return Redirect::to('/');

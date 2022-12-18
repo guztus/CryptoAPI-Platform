@@ -5,7 +5,6 @@ namespace App\Controllers;
 use App\Redirect;
 use App\Repositories\Coins\CoinsRepository;
 use App\Repositories\User\UserAssetsRepository;
-use App\Services\User\Assets\UserAssetsListService;
 use App\Template;
 
 class PortfolioController
@@ -17,7 +16,7 @@ class PortfolioController
         $this->coinsRepository = $coinsRepository;
     }
 
-    public function index()
+    public function show()
     {
         if (empty($_SESSION['auth_id'])) {
             return Redirect::to('/login');

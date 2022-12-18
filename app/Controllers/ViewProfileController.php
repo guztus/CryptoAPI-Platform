@@ -73,6 +73,9 @@ class ViewProfileController
             return Redirect::to('/profile/' . $vars['id']);
         }
 
+        $_SESSION['alerts']['success'] [] =
+            "Successfully sent {$_POST['coinAmount']} {$_POST['symbol']} to user #{$_POST['receivingUserId']}!";
+
         (new TransactionSendReceiveService())->execute(
             $_SESSION['auth_id'],
             'send',

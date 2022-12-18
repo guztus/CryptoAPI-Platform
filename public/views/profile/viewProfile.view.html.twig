@@ -94,6 +94,7 @@
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-md-12 col-xl-6">
+
                 {% for error in errors.password %}
                     <div class="alert alert-danger" role="alert">
                         {{ error }}
@@ -104,6 +105,12 @@
                         {{ error }}
                     </div>
                 {% endfor %}
+                {% for alert in alerts.success %}
+                    <div class="alert alert-info" role="alert">
+                        {{ alert }}
+                    </div>
+                {% endfor %}
+
                 <div class="card" style="border-radius: 15px;">
                     <div class="card-body text-center">
                         <div class="mt-3 mb-4">
@@ -116,12 +123,11 @@
                             {% if user.id == auth.id %}
                                 (You)
                             {% endif %}
-</span>
+                                </span>
                         <p class="text-muted mb-4" style="font-size: 0.8em">Registered
                             at: {{ user.registrationTime|date("m/d/Y") }}</p>
 
                         {% if auth and user.id != auth.id %}
-
                             <p>
                                 <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample"
                                    role="button" aria-expanded="false" aria-controls="collapseExample">
@@ -150,8 +156,11 @@
                                                     name="symbol"
                                                     class="form-text">
                                                 {% for asset in assetList %}
-                                                    <option id="selected_coin" value="{{ asset.symbol }}"
-                                                            style="text-align: left">{{ asset.symbol }}</option>
+                                                    {% if asset.amount == 0 %}
+                                                    {% else %}
+                                                        <option id="selected_coin" value="{{ asset.symbol }}"
+                                                                style="text-align: left">{{ asset.symbol }}</option>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </select>
                                         </div>

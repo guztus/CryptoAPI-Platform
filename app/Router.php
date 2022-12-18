@@ -28,10 +28,10 @@ class Router
 
             $router->addRoute('GET', '/logout', [LogoutController::class, 'logout']);
 
-            $router->addRoute('GET', '/profile', [ProfileController::class, 'showForm']);
-            $router->addRoute('POST', '/profile', [ProfileController::class, 'update']);
+            $router->addRoute('GET', '/profile', [ProfileController::class, 'show']);
+            $router->addRoute('POST', '/profile', [ProfileController::class, 'updateBalance']);
 
-            $router->addRoute('GET', '/portfolio', [PortfolioController::class, 'index']);
+            $router->addRoute('GET', '/portfolio', [PortfolioController::class, 'show']);
 
             $router->addRoute('GET', '/profile/', [ViewProfileController::class, 'searchUser']);
             $router->addRoute('POST', '/profile/', [ViewProfileController::class, 'getUser']);

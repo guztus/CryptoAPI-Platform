@@ -8,7 +8,7 @@ use App\Template;
 
 class ProfileController
 {
-    public function showForm()
+    public function show()
     {
         if (empty($_SESSION['auth_id'])) {
             return Redirect::to('/login');
@@ -16,7 +16,7 @@ class ProfileController
         return Template::render('profile/profile.view.twig');
     }
 
-    public function update(): Redirect
+    public function updateBalance(): Redirect
     {
         if (empty($_SESSION['auth_id'])) {
             return Redirect::to('/login');
@@ -31,9 +31,7 @@ class ProfileController
 //
 //        	$user->withdrawBalance
 //        	$user->modifyAs...
-
 //            (`$this->userRepository->save($user)`) db – save($user) ..
-
 
         (new TransactionDepositWithdrawService())->execute(
             (int)$_SESSION['auth_id'],
