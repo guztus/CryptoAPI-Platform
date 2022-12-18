@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Repositories\Coins\CoinsRepository;
 use App\Repositories\User\UserAssetsRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -51,35 +50,66 @@ class Validator
         }
     }
 
+    public function checkPasswordById(int $id, string $password)
+    {
+        $user = $this->queryBuilder->select('*')
+            ->from('users')
+            ->where('id = ?')
+            ->setParameter(0, $id)
+            ->fetchAssociative();
+
+        if (!$user || !password_verify($password, $user['password'])) {
+            $_SESSION['errors']['password'] [] =
+                'Entered password is incorrect!';
+        }
+    }
+
     public function buySellTransaction(
         int    $userId,
         string $transactionType,
         string $symbol,
         float  $fiatAmount,
         float  $currentCoinPrice,
-        float $userFiatBalance
+        float  $userFiatBalance
     )
     {
+        if ($transactionType !== 'buy' && $transactionType !== 'sell') {
+            $_SESSION['errors']['transactionType'] [] =
+                'Transaction type is not valid!';
+        }
+
         $this->transactionValue($fiatAmount);
         // if is SELL order and user does not have enough COIN balance
         $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol);
         if ($transactionType == 'sell' && $fiatAmount > $currentAssetAmount * $currentCoinPrice) {
-            $_SESSION['errors']['transaction'] [] = 'You do not have enough coins to sell this amount!';
+            $_SESSION['errors']['transaction'] [] =
+                'You do not have enough coins to sell this amount!';
         }
 
         $this->transactionValue($fiatAmount);
         // if is BUY order and user does not have enough FIAT balance
         if ($transactionType == 'buy' && $fiatAmount > $userFiatBalance) {
-            $_SESSION['errors']['transaction'] [] = 'You do not have enough money to buy this amount of coins!';
+            $_SESSION['errors']['transaction'] [] =
+                'You do not have enough money to buy this amount of coins!';
         }
     }
 
-    private function transactionValue(
+    public function transactionValue(
         $fiatAmount
     )
     {
         if ($fiatAmount < 0 || !$fiatAmount) {
-            $_SESSION['errors']['transaction'] [] = 'Transaction error';
+            $_SESSION['errors']['transaction'] [] =
+                'Transaction error';
+        }
+    }
+
+    public function assetAmount(int $userId, string $symbol, int $amount)
+    {
+        $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol);
+        if ($amount > $currentAssetAmount) {
+            $_SESSION['errors']['transaction'] [] =
+                "You do not have enough $symbol to send this amount!";
         }
     }
 

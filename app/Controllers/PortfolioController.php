@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Redirect;
 use App\Repositories\Coins\CoinsRepository;
+use App\Repositories\User\UserAssetsRepository;
 use App\Services\User\Assets\UserAssetsListService;
 use App\Template;
 
@@ -22,7 +23,8 @@ class PortfolioController
             return Redirect::to('/login');
         }
 
-        $assetList = ((new UserAssetsListService($this->coinsRepository))->execute($_SESSION['auth_id']));
+        $assetList = (new UserAssetsRepository($this->coinsRepository))
+            ->getAssetList($_SESSION['auth_id']);
 
         return Template::render('portfolio/portfolio.view.twig', ['assetList' => $assetList->getAllAssets() ?? []]);
     }

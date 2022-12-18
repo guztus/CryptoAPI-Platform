@@ -4,10 +4,11 @@ namespace App\Controllers;
 
 use App\Redirect;
 use App\Repositories\Coins\CoinsRepository;
-use App\Services\User\Assets\UserAssetsListService;
-use App\Services\User\Transaction\UserDoTransactionService;
+use App\Repositories\User\UserAssetsRepository;
+use App\Services\User\Transaction\TransactionSendReceiveService;
 use App\Services\User\UserGetInformationService;
 use App\Template;
+use App\Validator;
 
 class ViewProfileController
 {
@@ -18,30 +19,32 @@ class ViewProfileController
         $this->coinsRepository = $coinsRepository;
     }
 
+    public function searchUser(): Template
+    {
+        return Template::render('profile/searchUser.view.twig');
+    }
+
     public function show(array $vars)
     {
-//      get user id from url
-//      get user from db
-//      get basic data about the user
-
         if (!empty($vars['id'])) {
             $user = (new UserGetInformationService())->execute($vars['id']);
 
             if (!$user) {
-                return Redirect::to('/');
+                $_SESSION['errors'] [] = 'User not found';
+                return Redirect::to('/profile/');
             }
         }
-//
+
         if (!$_SESSION['auth_id']) {
             $assetList = null;
         } else {
-            $assetList = ((new UserAssetsListService($this->coinsRepository))->execute($_SESSION['auth_id']));
-        }
-
-        if (empty($assetList)) {
-            $assetList = null;
-        } else {
-            $assetList = $assetList->getAllAssets();
+            $assetList = (new UserAssetsRepository($this->coinsRepository))
+                ->getAssetList($_SESSION['auth_id']);
+            if (empty($assetList)) {
+                $assetList = null;
+            } else {
+                $assetList = $assetList->getAllAssets();
+            }
         }
 
         return Template::render('profile/viewProfile.view.html.twig', [
@@ -50,27 +53,37 @@ class ViewProfileController
         ]);
     }
 
-    public function sendCoins(): Redirect
+    public function getUser(): Redirect
     {
-//        validate if user has enough coins
-//        validate if user exists
-//        validate if user is not the same as the logged-in user
-//        send coins
-//        redirect to profile
+        if ($_POST['id']) {
+            return Redirect::to("http://$_SERVER[HTTP_HOST]/profile/" . $_POST['id']);
+        }
 
-        (new UserDoTransactionService($this->coinsRepository))->execute(
+        return Redirect::to('/profile/');
+    }
+
+    public function sendCoins($vars): Redirect
+    {
+        $validator = new Validator();
+        $validator->transactionValue($_POST['coinAmount']);
+        $validator->checkPasswordById($_SESSION['auth_id'], $_POST['password']);
+        $validator->assetAmount($_SESSION['auth_id'], $_POST['symbol'], $_POST['coinAmount']);
+
+        if (!Validator::passed()) {
+            return Redirect::to('/profile/' . $vars['id']);
+        }
+
+        (new TransactionSendReceiveService())->execute(
             $_SESSION['auth_id'],
             'send',
             $_POST['symbol'],
-            null,
             $_POST['coinAmount'],
         );
 
-        (new UserDoTransactionService($this->coinsRepository))->execute(
+        (new TransactionSendReceiveService())->execute(
             $_POST['receivingUserId'],
             'receive',
             $_POST['symbol'],
-            null,
             $_POST['coinAmount'],
         );
 

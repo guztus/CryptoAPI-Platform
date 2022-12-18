@@ -2,7 +2,7 @@
 
 namespace App\ViewVariables;
 
-use App\Services\User\Transaction\UserGetTransactionHistoryService;
+use App\Repositories\User\Transaction\UserTransactionHistoryRepository;
 
 class TransactionHistoryViewVariables implements ViewVariablesInterface
 {
@@ -15,7 +15,8 @@ class TransactionHistoryViewVariables implements ViewVariablesInterface
     {
         if (!empty($_SESSION['auth_id'])) {
 
-            $transactionHistory = (new UserGetTransactionHistoryService())->execute($_SESSION['auth_id']);
+            $transactionHistory = (new UserTransactionHistoryRepository())
+                ->getHistory($_SESSION['auth_id']);
 
             return [
                 'list' => $transactionHistory->all() ?? [],

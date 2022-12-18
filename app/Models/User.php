@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Services\User\Transaction\TransactionDepositWithdrawService;
+
 class User
 {
     private ?int $id;
@@ -49,5 +51,19 @@ class User
     public function getRegistrationTime(): string
     {
         return $this->registrationTime;
+    }
+
+    public function withdraw(
+        string $transactionType,
+        string $symbol,
+        float $amount
+    ): void
+    {
+        (new TransactionDepositWithdrawService())->execute(
+            $this->id,
+            $transactionType,
+            $symbol,
+            $amount,
+        );
     }
 }

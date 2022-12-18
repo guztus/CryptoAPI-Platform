@@ -19,7 +19,7 @@ class UserTransactionHistoryRepository
         $this->queryBuilder = $this->connection->createQueryBuilder();
     }
 
-    public function getTransactionHistory(int $userId): TransactionCollection
+    public function getHistory(int $userId): TransactionCollection
     {
         $queryBuilder = $this->queryBuilder;
 
@@ -50,7 +50,7 @@ class UserTransactionHistoryRepository
         return $transactionCollection;
     }
 
-    public function addTransaction(Transaction $transaction): void
+    public function add(Transaction $transaction): void
     {
         $queryBuilder = $this->queryBuilder;
 

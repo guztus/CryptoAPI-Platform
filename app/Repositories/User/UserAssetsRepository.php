@@ -29,9 +29,9 @@ class UserAssetsRepository
         string $operation,
         string $symbol,
         float  $amount,
-        ?float $price,
-        ?float $oldDollarCostAverage,
-        ?float $purchaseDollarCostAverage
+        ?float $price = 0,
+        ?float $oldDollarCostAverage = 0,
+        ?float $purchaseDollarCostAverage = 0
         // PRICE null when DEPOSIT / WITHDRAW / SEND
         // DOLLAR COST AVERAGE null when DEPOSIT / WITHDRAW / SEND
         // OLD DOLLAR COST AVERAGE null when buy & no assets
@@ -67,14 +67,13 @@ class UserAssetsRepository
             if ($operation === 'sell' || $operation === 'send') {
                 $operator = '-';
                 $newDollarCostAverage = $oldDollarCostAverage;
-            } else {
+            } else if ($operation === 'buy' || $operation === 'receive') {
                 $operator = '+';
                 $newDollarCostAverage = ($oldDollarCostAverage + $purchaseDollarCostAverage) / 2;
             }
 
-
             $sql = "UPDATE user_assets SET amount = amount $operator '$amount' WHERE user_id = '$userId' AND symbol = '$symbol'";
-            $this->database->query($sql);
+            $this->database->executeQuery($sql);
 
 //            $query = $this->queryBuilder
 //                ->update('user_assets')

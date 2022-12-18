@@ -19,15 +19,25 @@ class Router
         $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $router) {
             $router->addRoute('GET', '/', [CoinsController::class, 'index']);
             $router->addRoute('POST', '/', [CoinsController::class, 'doTransaction']);
+
             $router->addRoute('GET', '/register', [RegistrationController::class, 'showForm']);
             $router->addRoute('POST', '/register', [RegistrationController::class, 'register']);
+
             $router->addRoute('GET', '/login', [LoginController::class, 'showForm']);
             $router->addRoute('POST', '/login', [LoginController::class, 'login']);
+
             $router->addRoute('GET', '/logout', [LogoutController::class, 'logout']);
+
             $router->addRoute('GET', '/profile', [ProfileController::class, 'showForm']);
             $router->addRoute('POST', '/profile', [ProfileController::class, 'update']);
+
             $router->addRoute('GET', '/portfolio', [PortfolioController::class, 'index']);
+
+            $router->addRoute('GET', '/profile/', [ViewProfileController::class, 'searchUser']);
+            $router->addRoute('POST', '/profile/', [ViewProfileController::class, 'getUser']);
+
             $router->addRoute('GET', '/profile/{id:\d+}', [ViewProfileController::class, 'show']);
+
             $router->addRoute('POST', '/profile/{id:\d+}', [ViewProfileController::class, 'sendCoins']);
         });
 
