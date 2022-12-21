@@ -32,7 +32,7 @@ class TwigLoader
             AlertsViewVariables::class,
             ErrorsViewVariables::class,
             UserAssetsViewVariables::class,
-            TransactionHistoryViewVariables::class
+//            TransactionHistoryViewVariables::class
         ];
 
         foreach ($authVariables as $variable) {

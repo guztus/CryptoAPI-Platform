@@ -4,7 +4,7 @@ namespace App\Models;
 
 class Transaction
 {
-    private int $id;
+    private string $id;
     private int $userId;
     private string $transactionType;
     private string $symbol;
@@ -15,7 +15,7 @@ class Transaction
     private ?int $databaseId;
 
     public function __construct(
-        int   $id,
+        string   $id,
         int    $userId,
         string $transactionType,
         string $symbol,
@@ -37,7 +37,7 @@ class Transaction
         $this->databaseId = $databaseId;
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

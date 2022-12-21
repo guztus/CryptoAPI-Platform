@@ -25,30 +25,52 @@ class TransactionBuySellService
         int    $userId,
         string $transactionType,
         string $symbol,
-        float  $fiatAmount
+        float  $assetAmount
     )
     {
         $currentCoinPrice = ((new CoinsService($this->coinsRepository))->execute($symbol))->getPrice();
+
+        $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol));
+
         $currentUser = (new UserGetInformationService())->execute($userId);
         $userFiatBalance = $currentUser->getFiatBalance();
-        $assetAmount = $fiatAmount / $currentCoinPrice;
 
-        (new Validator())->buySellTransaction(
-            $userId,
-            $transactionType,
-            $symbol,
-            $fiatAmount,
-            $currentCoinPrice,
-            $userFiatBalance,
-        );
+        if ($transactionType == 'closeShort') {
+            $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol, 'short'));
+            $fiatAmount = ((((($userAssetsRepository->getAverageCost() - $currentCoinPrice)
+                        / $userAssetsRepository->getAverageCost())) + 1)
+                * ($userAssetsRepository->getAverageCost()
+                    * $assetAmount));
+
+        } else {
+            $fiatAmount = $assetAmount * $currentCoinPrice;
+        }
+
+//        var_dump($givenAmount);
+//var_dump($assetAmount);die;
+//
+//        (new Validator())->buySellTransaction(
+//            $userId,
+//            $transactionType,
+//            $symbol,
+//            $fiatAmount,
+//            $currentCoinPrice,
+//            $userFiatBalance,
+//        );
 
         // if didn't pass Validation, errors will be from in Validator class
-        if (!Validator::passed()) {
-            return;
-        }
+//        if (!Validator::passed()) {
+//            return;
+//        }
+
         // if all is ok, create transaction & modify assets
         $_SESSION['alerts']['transaction'] [] =
             ucfirst($transactionType) . " order successful: $assetAmount $symbol for $fiatAmount USD!";
+
+//        var_dump($_POST);die;
+        if ($transactionType == 'buy' || $transactionType == 'short') {
+            $fiatAmount = $fiatAmount * (-1);
+        }
 
         $transaction = new Transaction(
             TransactionIdGenerator::get(),
@@ -66,7 +88,6 @@ class TransactionBuySellService
 
         $oldDollarCostAverage = (new UserAssetsRepository())->getOldDollarCostAverage($userId, $symbol);
         $purchaseDollarCostAverage = $fiatAmount / $assetAmount;
-
 
         (new UserAssetsRepository())
             ->modifyAssets(

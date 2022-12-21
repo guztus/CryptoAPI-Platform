@@ -37,14 +37,22 @@ class UserAssetsRepository
         // OLD DOLLAR COST AVERAGE null when buy & no assets
     ): void
     {
+        if ($operation == 'short' || $operation == 'closeShort') {
+            $type = 'short';
+        } else {
+            $type = 'standard';
+        }
+
         // check if user has any assets of this type
         $userHasThisAsset = $this->queryBuilder
             ->select('*')
             ->from('user_assets')
             ->where('user_id = ?')
             ->andWhere('symbol = ?')
+            ->andWhere('type = ?')
             ->setParameter(0, $userId)
             ->setParameter(1, $symbol)
+            ->setParameter(2, $type)
             ->fetchAssociative();
 
         // if they don't, create a new asset
@@ -53,26 +61,28 @@ class UserAssetsRepository
                 ->insert('user_assets')
                 ->values([
                     'user_id' => '?',
+                    'type' => '?',
                     'symbol' => '?',
                     'amount' => '?',
                     'average_cost' => '?'
                 ])
                 ->setParameter(0, $userId)
-                ->setParameter(1, $symbol)
-                ->setParameter(2, $amount)
-                ->setParameter(3, $price);
+                ->setParameter(1, $type)
+                ->setParameter(2, $symbol)
+                ->setParameter(3, $amount)
+                ->setParameter(4, $price);
             $query->executeQuery();
         } else {
 
-            if ($operation === 'sell' || $operation === 'send') {
-                $operator = '-';
-                $newDollarCostAverage = $oldDollarCostAverage;
-            } else if ($operation === 'buy' || $operation === 'receive') {
-                $operator = '+';
-                $newDollarCostAverage = ($oldDollarCostAverage + $purchaseDollarCostAverage) / 2;
-            }
+//            if ($operation === 'sell' || $operation === 'send' || $operation === 'closeShort') {
+//                $operator = '-';
+//                $newDollarCostAverage = $oldDollarCostAverage;
+//            } else if ($operation === 'buy' || $operation === 'receive'  || $operation === 'short'  ) {
+//                $operator = '+';
+//                $newDollarCostAverage = ($oldDollarCostAverage + $purchaseDollarCostAverage) / 2;
+//            }
 
-            $sql = "UPDATE user_assets SET amount = amount $operator '$amount' WHERE user_id = '$userId' AND symbol = '$symbol'";
+            $sql = "UPDATE user_assets SET amount = amount +'$amount' WHERE user_id = '$userId' AND symbol = '$symbol' AND type = '$type'";
             $this->database->executeQuery($sql);
 
 //            $query = $this->queryBuilder
@@ -111,6 +121,7 @@ class UserAssetsRepository
 
             $assetList->addAsset(new Asset(
                 $asset['symbol'],
+                $asset['type'],
                 (float)$asset['amount'],
                 (float)$asset['average_cost'],
                 $assetSymbol->getPrice()
@@ -120,20 +131,23 @@ class UserAssetsRepository
         return $assetList;
     }
 
-    public function getSingleAsset(int $userId, string $symbol): ?Asset
+    public function getSingleAsset(int $userId, string $symbol, ?string $type = 'standard'): ?Asset
     {
         $rawAsset = $this->queryBuilder
             ->select('*')
             ->from('user_assets')
             ->where('user_id = ?')
             ->andWhere('symbol = ?')
+            ->andWhere('type = ?')
             ->setParameter(0, $userId)
             ->setParameter(1, $symbol)
+            ->setParameter(2, $type)
             ->fetchAssociative();
 
         if ($rawAsset) {
             return new Asset(
                 $rawAsset['symbol'],
+                $rawAsset['type'],
                 (float)$rawAsset['amount'],
                 (float)$rawAsset['average_cost']
             );

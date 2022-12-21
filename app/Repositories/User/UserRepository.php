@@ -34,20 +34,12 @@ class UserRepository
 
     public function modifyFiatBalance(
         int    $id,
-        float  $fiatAmount,
-        string $operation
+        float  $fiatAmount
     ): void
     {
-        if ($operation == 'sell' || $operation == 'deposit') {
-            $operator = '+';
-        } else {
-            $operator = '-';
-        }
-
-//        var_dump($fiatAmount);die;
         $query = $this->queryBuilder
             ->update('users')
-            ->set('fiat_balance', "fiat_balance $operator $fiatAmount")
+            ->set('fiat_balance', "fiat_balance + $fiatAmount")
             ->where('id = ?')
             ->setParameter(0, $id);
         $query->executeStatement();

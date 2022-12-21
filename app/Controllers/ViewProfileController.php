@@ -78,6 +78,7 @@ class ViewProfileController
 
         (new TransactionSendReceiveService())->execute(
             $_SESSION['auth_id'],
+            $_POST['receivingUserId'],
             'send',
             $_POST['symbol'],
             $_POST['coinAmount'],
@@ -85,6 +86,7 @@ class ViewProfileController
 
         (new TransactionSendReceiveService())->execute(
             $_POST['receivingUserId'],
+            $_SESSION['auth_id'],
             'receive',
             $_POST['symbol'],
             $_POST['coinAmount'],

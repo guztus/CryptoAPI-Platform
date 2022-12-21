@@ -11,17 +11,18 @@ class TransactionSendReceiveService
 {
     public function execute(
         int    $userId,
+        int    $otherUserId,
         string $transactionType,
         string $symbol,
         float  $amount
     ): void
     {
         $transaction = new Transaction(
-            TransactionIdGenerator::get(),
+            TransactionIdGenerator::get()."(#$otherUserId)",
             $userId,
             $transactionType,
             $symbol,
-            null,
+            $amount,
             null,
             null,
             date('Y-m-d H:i:s')

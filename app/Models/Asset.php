@@ -5,17 +5,20 @@ namespace App\Models;
 class Asset
 {
     private string $symbol;
+    private ?string $type;
     private float $amount;
     private float $average_cost;
     private ?float $current_price;
 
     public function __construct(
         string $symbol,
+        ?string $type,
         float $amount,
         float $average_cost,
         float $current_price = null)
     {
         $this->symbol = $symbol;
+        $this->type = $type;
         $this->amount = $amount;
         $this->average_cost = $average_cost;
         $this->current_price = $current_price;
@@ -24,6 +27,11 @@ class Asset
     public function getSymbol(): string
     {
         return $this->symbol;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
     }
 
     public function getAmount(): float

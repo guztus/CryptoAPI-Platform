@@ -52,6 +52,8 @@ class UserTransactionHistoryRepository
 
     public function add(Transaction $transaction): void
     {
+//        var_dump($transaction);die;
+
         $queryBuilder = $this->queryBuilder;
 
         $queryBuilder
