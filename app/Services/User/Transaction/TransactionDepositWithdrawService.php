@@ -38,7 +38,6 @@ class TransactionDepositWithdrawService
             ->modifyFiatBalance(
                 $transaction->getUserId(),
                 $transaction->getOrderSum(),
-                $transaction->getTransactionType()
             );
     }
 }

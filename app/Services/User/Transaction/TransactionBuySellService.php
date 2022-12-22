@@ -77,7 +77,6 @@ class TransactionBuySellService
         $_SESSION['alerts']['transaction'] [] =
             ucfirst($transactionType) . " order successful: $assetAmount $symbol for $fiatAmount USD!";
 
-//        var_dump($_POST);die;
         if ($transactionType == 'buy' || $transactionType == 'short') {
             $fiatAmount = $fiatAmount * (-1);
         } else {

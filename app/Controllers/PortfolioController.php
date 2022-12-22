@@ -22,7 +22,7 @@ class PortfolioController
             return Redirect::to('/login');
         }
 
-        $portfolioData = (new PortfolioService($this->coinsRepository))->execute();
+        $portfolioData = (new PortfolioService($this->coinsRepository))->execute($_SESSION['auth_id']);
 
         return Template::render('portfolio/portfolio.view.twig', ['displayData' => $portfolioData ?? []]);
     }

@@ -128,91 +128,93 @@
                             at: {{ user.registrationTime|date("m/d/Y") }}</p>
 
                         {% if auth and user.id != auth.id %}
-                            <p>
-                                <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample"
-                                   role="button" aria-expanded="false" aria-controls="collapseExample">
-                                    Send Coins
-                                </a>
-                            </p>
+                            {% if assetList is not empty %}
+                                <p>
+                                    <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample"
+                                       role="button" aria-expanded="false" aria-controls="collapseExample">
+                                        Send Coins
+                                    </a>
+                                </p>
 
-                            <div class="collapse" id="collapseExample">
-                                <div class="card card-body">
-                                    <form id="form" class="my-2" method="POST">
-                                        <input name="symbol" value="{{ coin.symbol }}" type="hidden">
-                                        <input name="transactionType" value="send" type="hidden">
-                                        <div class="input-group mb-3">
-                                            <input name="receivingUserId" value="{{ user.id }}" type="hidden">
-                                            <input id="input_coin_amount"
-                                                   class="form-control"
-                                                   type="number"
-                                                   name="coinAmount"
-                                                   step="0.000000001"
-                                                   min="0"
-                                                   onkeydown="showPasswordInput()"
-                                                   placeholder="Coin Amount"
-                                                   required>
-                                            <select class="input-group-text"
-                                                    id="symbol"
-                                                    name="symbol"
-                                                    class="form-text">
+                                <div class="collapse" id="collapseExample">
+                                    <div class="card card-body">
+                                        <form id="form" class="my-2" method="POST">
+                                            <input name="symbol" value="{{ coin.symbol }}" type="hidden">
+                                            <input name="transactionType" value="send" type="hidden">
+                                            <div class="input-group mb-3">
+                                                <input name="receivingUserId" value="{{ user.id }}" type="hidden">
+                                                <input id="input_coin_amount"
+                                                       class="form-control"
+                                                       type="number"
+                                                       name="coinAmount"
+                                                       step="0.000000001"
+                                                       min="0"
+                                                       onkeydown="showPasswordInput()"
+                                                       placeholder="Coin Amount"
+                                                       required>
+                                                <select class="input-group-text"
+                                                        id="symbol"
+                                                        name="symbol"
+                                                        class="form-text">
+                                                    {% for asset in assetList %}
+                                                        {% if asset.amount == 0 or asset.type == 'short' %}
+                                                        {% else %}
+                                                            <option id="selected_coin" value="{{ asset.symbol }}"
+                                                                    style="text-align: left">{{ asset.symbol }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="input-group mb-3">
+                                                <input id="password_confirmation"
+                                                       class="form-control"
+                                                       style="visibility: hidden"
+                                                       name="password"
+                                                       type="password"
+                                                       placeholder="Password"
+                                                       required>
+                                            </div>
+                                            <input form="form" type="submit" class="btn"
+                                                   value="Send coins to {{ user.name }} #{{ user.id }}">
+                                        </form>
+
+                                        <div>
+                                            <h5 style="margin-top: 1em">Your coins: </h5>
+                                            <table class="sortable table table-light table-striped table-hover table-condensed"
+                                                   style="border-radius: 10px; overflow: hidden; margin-top: 2em; margin-bottom: 1em">
+                                                <thead>
+                                                <tr>
+                                                    <th class="centered">Symbol</th>
+                                                    <th>Current Price</th>
+                                                    <th>Amount</th>
+                                                    <th>$ Amount</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
                                                 {% for asset in assetList %}
                                                     {% if asset.amount == 0 or asset.type == 'short' %}
                                                     {% else %}
-                                                        <option id="selected_coin" value="{{ asset.symbol }}"
-                                                                style="text-align: left">{{ asset.symbol }}</option>
+                                                        <tr>
+                                                            <td class="centered">
+                                                                <a class="orangeUnderLine">
+                                                                    {{ asset.symbol }}
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                ${{ asset.currentPrice|number_format(6, '.', ',') }}</td>
+                                                            <td>{{ asset.amount|number_format(6, '.', ',') }}</td>
+                                                            <td>
+                                                                ${{ (asset.amount*asset.currentPrice)|number_format(2, '.', ',') }}</td>
+                                                        </tr>
                                                     {% endif %}
+
                                                 {% endfor %}
-                                            </select>
+                                                </tbody>
+                                            </table>
                                         </div>
-                                        <div class="input-group mb-3">
-                                            <input id="password_confirmation"
-                                                   class="form-control"
-                                                   style="visibility: hidden"
-                                                   name="password"
-                                                   type="password"
-                                                   placeholder="Password"
-                                                   required>
-                                        </div>
-                                        <input form="form" type="submit" class="btn"
-                                               value="Send coins to {{ user.name }} #{{ user.id }}">
-                                    </form>
-
-                                    <div>
-                                        <h5 style="margin-top: 1em">Your coins: </h5>
-                                        <table class="sortable table table-light table-striped table-hover table-condensed"
-                                               style="border-radius: 10px; overflow: hidden; margin-top: 2em; margin-bottom: 1em">
-                                            <thead>
-                                            <tr>
-                                                <th class="centered">Symbol</th>
-                                                <th>Current Price</th>
-                                                <th>Amount</th>
-                                                <th>$ Amount</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% for asset in assetList %}
-                                                {% if asset.amount == 0 or asset.type == 'short' %}
-                                                {% else %}
-                                                    <tr>
-                                                        <td class="centered">
-                                                            <a class="orangeUnderLine">
-                                                                {{ asset.symbol }}
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            ${{ asset.currentPrice|number_format(6, '.', ',') }}</td>
-                                                        <td>{{ asset.amount|number_format(6, '.', ',') }}</td>
-                                                        <td>
-                                                            ${{ (asset.amount*asset.currentPrice)|number_format(2, '.', ',') }}</td>
-                                                    </tr>
-                                                {% endif %}
-
-                                            {% endfor %}
-                                            </tbody>
-                                        </table>
                                     </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

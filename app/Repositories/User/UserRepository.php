@@ -10,12 +10,10 @@ use Doctrine\DBAL\Connection;
 class UserRepository
 {
     private ?Connection $connection;
-    private QueryBuilder $queryBuilder;
 
     public function __construct()
     {
         $this->connection = (new Database())->getConnection();
-        $this->queryBuilder = $this->connection->createQueryBuilder();
     }
 
     public function getUserData(
@@ -33,11 +31,11 @@ class UserRepository
     }
 
     public function modifyFiatBalance(
-        int    $id,
-        float  $fiatAmount
+        int   $id,
+        float $fiatAmount
     ): void
     {
-        $query = $this->queryBuilder
+        $query = $this->connection->createQueryBuilder()
             ->update('users')
             ->set('fiat_balance', "fiat_balance + $fiatAmount")
             ->where('id = ?')
@@ -52,7 +50,7 @@ class UserRepository
         if ($id == null) {
             return null;
         }
-        $user = $this->queryBuilder
+        $user = $this->connection->createQueryBuilder()
             ->select('*')
             ->from('users')
             ->where('id = ?')
@@ -77,7 +75,7 @@ class UserRepository
         string $email
     ): ?User
     {
-        $user = $this->queryBuilder
+        $user = $this->connection->createQueryBuilder()
             ->select('*')
             ->from('users')
             ->where('email = ?')

@@ -6,24 +6,19 @@ use App\Database;
 use App\Models\Collections\TransactionCollection;
 use App\Models\Transaction;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 
 class UserTransactionHistoryRepository
 {
     private ?Connection $connection;
-    private QueryBuilder $queryBuilder;
 
     public function __construct()
     {
         $this->connection = (new Database())->getConnection();
-        $this->queryBuilder = $this->connection->createQueryBuilder();
     }
 
     public function getHistory(int $userId): TransactionCollection
     {
-        $queryBuilder = $this->queryBuilder;
-
-        $queryBuilder
+        $queryBuilder = $this->connection->createQueryBuilder()
             ->select('*')
             ->from('transaction_history')
             ->where("user_id = ?")
@@ -52,11 +47,7 @@ class UserTransactionHistoryRepository
 
     public function add(Transaction $transaction): void
     {
-//        var_dump($transaction);die;
-
-        $queryBuilder = $this->queryBuilder;
-
-        $queryBuilder
+        $queryBuilder = $this->connection->createQueryBuilder()
             ->insert('transaction_history')
             ->values([
                 'extra_unique_id' => '?',

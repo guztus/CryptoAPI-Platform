@@ -15,24 +15,20 @@ class PortfolioService
         $this->coinsRepository = $coinsRepository;
     }
 
-    public function execute(): array
+    public function execute(int $userId): array
     {
         $displayData = [];
 
         $assetList = (new UserAssetsRepository($this->coinsRepository))
-            ->getAssetList($_SESSION['auth_id']);
+            ->getAssetList($userId);
 
         $transactionHistory = (new UserTransactionHistoryRepository())
-            ->getHistory($_SESSION['auth_id']);
-
-//        $shortPositions = (new UserShortPositionsRepository())
-//            ->getShortPositions($_SESSION['auth_id']);
+            ->getHistory($userId);
 
         if (!empty($assetList)) {
             $displayData ['assetList'] = $assetList->getAllAssets() ?? [];
         }
         $displayData ['transactionHistory'] = $transactionHistory->all() ?? [];
-//        $displayData ['shortPositions'] = $transactionHistory->all() ?? [];
 
         return $displayData;
     }

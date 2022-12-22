@@ -7,13 +7,11 @@ use App\Models\Asset;
 use App\Models\Collections\AssetCollection;
 use App\Repositories\Coins\CoinsRepository;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 
 class UserAssetsRepository
 {
     private ?CoinsRepository $coinsRepository;
     private ?Connection $database;
-    private QueryBuilder $queryBuilder;
 
     public function __construct(?CoinsRepository $coinsRepository = null)
     {
@@ -84,12 +82,6 @@ class UserAssetsRepository
             } else {
                 $newDollarCostAverage = $oldDollarCostAverage;
             }
-
-//            $sql = "UPDATE user_assets SET amount = amount +'$amount' WHERE user_id = '$userId' AND symbol = '$symbol' AND type = '$type'";
-//            $this->database->executeQuery($sql);
-//
-//            $sql = "UPDATE user_assets SET average_cost = '$newDollarCostAverage' WHERE user_id = '$userId' AND symbol = '$symbol' AND type = '$type'";
-//            $this->database->executeQuery($sql);
 
             $newValue = $previousValue + $amount;
 
