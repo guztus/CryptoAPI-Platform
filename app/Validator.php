@@ -71,7 +71,6 @@ class Validator
         ?string $assetType,
         float   $fiatAmount,
         float   $assetAmount,
-        float   $currentCoinPrice,
         float   $userFiatBalance
     )
     {
@@ -83,7 +82,11 @@ class Validator
                 'Transaction type is not valid!';
         }
 
-        $this->transactionValue($fiatAmount, $assetAmount);
+        if ($transactionType !== 'short'
+            && $transactionType !== 'closeShort') {
+            $this->transactionValue($fiatAmount, $assetAmount);
+        }
+
         // if is SELL or BUY order and user does not have enough COIN balance
         $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol, $assetType);
 
@@ -96,7 +99,7 @@ class Validator
         }
 
         // if is BUY or SHORT order and user does not have enough FIAT balance
-        if (($transactionType == 'buy' || $transactionType == 'short')
+        if (($transactionType == 'buy')
             && $fiatAmount > $userFiatBalance) {
             $_SESSION['errors']['transaction'] [] =
                 'You do not have enough money to purchase this amount of coins!';
@@ -104,7 +107,7 @@ class Validator
     }
 
     public function transactionValue(
-        float $fiatAmount,
+        float  $fiatAmount,
         ?float $assetAmount = 1
     )
     {

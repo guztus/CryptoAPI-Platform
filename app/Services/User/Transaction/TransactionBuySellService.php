@@ -46,14 +46,14 @@ class TransactionBuySellService
             $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol, $assetType ?? null));
 
             if (!$userAssetsRepository) {
-                   die;
+                $fiatAmount = 0;
+            } else {
+
+                $fiatAmount = (($userAssetsRepository->getAverageCost() - $currentCoinPrice) * $userAssetsRepository->getAmount());
             }
-//            var_dump($userAssetsRepository->getAverageCost());die;
 
-            $fiatAmount = (($userAssetsRepository->getAmount() * $userAssetsRepository->getAverageCost()) +
-                (($userAssetsRepository->getAmount() * $userAssetsRepository->getAverageCost()) *
-                    ((($userAssetsRepository->getAverageCost() - $currentCoinPrice) / $currentCoinPrice))));
-
+        } else if ($transactionType == 'short') {
+            $fiatAmount = 0;
         } else {
             $fiatAmount = $assetAmount * $currentCoinPrice;
         }
@@ -65,7 +65,6 @@ class TransactionBuySellService
             $assetType ?? null,
             $fiatAmount,
             $assetAmount,
-            $currentCoinPrice,
             $userFiatBalance,
         );
 
@@ -107,7 +106,7 @@ class TransactionBuySellService
 
         $oldDollarCostAverage = (new UserAssetsRepository())->getOldDollarCostAverage($userId, $symbol, $type);
 
-        $purchaseDollarCostAverage = $fiatAmount*(-1) / $assetAmount;
+        $purchaseDollarCostAverage = $currentCoinPrice;
 
         (new UserAssetsRepository())
             ->modifyAssets(

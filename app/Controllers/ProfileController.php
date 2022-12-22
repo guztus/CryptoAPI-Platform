@@ -32,7 +32,6 @@ class ProfileController
 //        	$user->withdrawBalance
 //        	$user->modifyAs...
 //            (`$this->userRepository->save($user)`) db – save($user) ..
-        var_dump('test');
 
         (new TransactionDepositWithdrawService())->execute(
             (int)$_SESSION['auth_id'],

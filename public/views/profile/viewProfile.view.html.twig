@@ -156,10 +156,10 @@
                                                     name="symbol"
                                                     class="form-text">
                                                 {% for asset in assetList %}
-                                                    {% if asset.amount == 0 %}
+                                                    {% if asset.amount == 0 or asset.type == 'short' %}
                                                     {% else %}
                                                         <option id="selected_coin" value="{{ asset.symbol }}"
-                                                                style="text-align: left">{{ asset.symbol }}{% if asset.type == 'short' %}({{ asset.type }}){% endif %}</option>
+                                                                style="text-align: left">{{ asset.symbol }}</option>
                                                     {% endif %}
                                                 {% endfor %}
                                             </select>
@@ -191,12 +191,12 @@
                                             </thead>
                                             <tbody>
                                             {% for asset in assetList %}
-                                                {% if asset.amount == 0 %}
+                                                {% if asset.amount == 0 or asset.type == 'short' %}
                                                 {% else %}
                                                     <tr>
                                                         <td class="centered">
                                                             <a class="orangeUnderLine">
-                                                                {{ asset.symbol }}{% if asset.type == 'short' %}({{ asset.type }}){% endif %}
+                                                                {{ asset.symbol }}
                                                             </a>
                                                         </td>
                                                         <td>

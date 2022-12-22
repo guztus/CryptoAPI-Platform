@@ -224,8 +224,7 @@
                             <div style="margin-left: auto">
                                 <span style="font-weight: bold; font-size: 0.8em"> ($<span
                                             class="monospace"
-                                    >{{ ((asset.short_amount*asset.short_average_cost)+((asset.short_amount*asset.short_average_cost)*(((asset.short_average_cost - coin.price)
-                                        / coin.price))))|number_format(2, '.', ',') }})</span>
+                                    >{{ ((asset.short_average_cost-coin.price)*asset.short_amount)|number_format(2, '.', ',') }})</span>
                                                                 </span>
                             </div>
                         </div>

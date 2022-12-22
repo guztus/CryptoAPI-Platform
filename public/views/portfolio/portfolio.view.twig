@@ -91,8 +91,7 @@
             {% set totalAssetCount = totalAssetCount + 1 %}
 
             {% if asset.type == 'short' %}
-                {% set assetsTotalSum = ((asset.amount*asset.averageCost)+((asset.amount*asset.averageCost)*(((asset.averageCost - asset.currentPrice)
-                    / asset.currentPrice)))) %}
+                {% set assetsTotalSum = ((asset.averageCost-asset.currentPrice)*asset.amount) %}
 
                 {% set totalProfitLoss = totalProfitLoss + ((((asset.averageCost - asset.currentPrice)
                     / asset.currentPrice))*100) %}
@@ -157,22 +156,21 @@
 
                     {% if asset.type == 'short' %}
                         <td>
-                            $
-                            {{ ((asset.amount*asset.averageCost)+((asset.amount*asset.averageCost)*(((asset.averageCost - asset.currentPrice)
-                            / asset.currentPrice))))
-                            |number_format(2, '.', ',') }}
+                            {% if (asset.averageCost-asset.currentPrice)*asset.amount >= 0 %}
+                                $ {{ ((asset.averageCost-asset.currentPrice)*asset.amount)|number_format(2, '.', ',') }}
+                            {% else %}
+                                -$ {{ (((asset.averageCost-asset.currentPrice)*asset.amount)*(-1))|number_format(2, '.', ',') }}
+                            {% endif %}
                         </td>
 
                         <td>
                             {% if asset.currentPrice > asset.averageCost %}
                                 <span class="text-danger">
-                            {{ ((((asset.averageCost - asset.currentPrice)
-                            / asset.currentPrice))*100)|number_format(2, '.', ',') }} ▼
+                            {{ ((((asset.averageCost-asset.currentPrice)*asset.amount)/(asset.currentPrice*asset.amount))*100)|number_format(2, '.', ',') }} ▼
                         </span>
                             {% else %}
                                 <span class="text-success">
-                            +{{ ((((asset.averageCost - asset.currentPrice)
-                                    / asset.currentPrice))*100)|number_format(2, '.', ',') }} ▲
+                            +{{ ((((asset.averageCost-asset.currentPrice)*asset.amount)/(asset.currentPrice*asset.amount))*100)|number_format(2, '.', ',') }} ▲
                         </span>
                             {% endif %}
                         </td>
@@ -180,13 +178,11 @@
                         <td>
                             {% if asset.currentPrice < asset.averageCost %}
                                 <span class="text-success">
-                                                +$ {{ ((asset.amount*asset.averageCost)*(((asset.averageCost - asset.currentPrice)
-                                    / asset.currentPrice)))|number_format(2, '.', ',') }}
+                                                +$ {{ (((asset.currentPrice-asset.averageCost)*asset.amount)*(-1))|number_format(2, '.', ',') }}
                                             </span>
                             {% else %}
                                 <span class="text-danger">
-                                                -$ {{ (((asset.amount*asset.averageCost)*(((asset.averageCost - asset.currentPrice)
-                                    / asset.currentPrice)))*(-1))|number_format(2, '.', ',') }}
+                                                -$ {{ ((asset.currentPrice-asset.averageCost)*asset.amount)|number_format(2, '.', ',') }}
                                             </span>
                             {% endif %}
                         </td>

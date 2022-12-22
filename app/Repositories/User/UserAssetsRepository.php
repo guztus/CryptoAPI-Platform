@@ -73,12 +73,11 @@ class UserAssetsRepository
 
             $checkIfUserHasAsset->executeQuery();
         } else {
-            var_dump($oldDollarCostAverage);
             if ($operation != 'send') {
                 if ($amount > 0) {
+
                     $newDollarCostAverage =
-                        (($userHasThisAsset['amount'] * $oldDollarCostAverage) + ($purchaseDollarCostAverage * $amount))
-                        / ($userHasThisAsset['amount'] + $amount) . " ";
+                        (($oldDollarCostAverage + $purchaseDollarCostAverage)/2) . " ";
                 } else {
                     $newDollarCostAverage = $oldDollarCostAverage;
                 }
