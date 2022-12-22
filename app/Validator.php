@@ -65,40 +65,52 @@ class Validator
     }
 
     public function buySellTransaction(
-        int    $userId,
-        string $transactionType,
-        string $symbol,
-        float  $fiatAmount,
-        float  $currentCoinPrice,
-        float  $userFiatBalance
+        int     $userId,
+        string  $transactionType,
+        string  $symbol,
+        ?string $assetType,
+        float   $fiatAmount,
+        float   $assetAmount,
+        float   $currentCoinPrice,
+        float   $userFiatBalance
     )
     {
-        if ($transactionType !== 'buy' && $transactionType !== 'sell') {
+        if ($transactionType !== 'buy'
+            && $transactionType !== 'sell'
+            && $transactionType !== 'closeShort'
+            && $transactionType !== 'short') {
             $_SESSION['errors']['transactionType'] [] =
                 'Transaction type is not valid!';
         }
 
-        $this->transactionValue($fiatAmount);
-        // if is SELL order and user does not have enough COIN balance
-        $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol);
-        if ($transactionType == 'sell' && $fiatAmount > $currentAssetAmount * $currentCoinPrice) {
+        $this->transactionValue($fiatAmount, $assetAmount);
+        // if is SELL or BUY order and user does not have enough COIN balance
+        $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol, $assetType);
+
+        if (
+            ($transactionType == 'sell' || $transactionType == 'closeShort')
+            && $assetAmount > $currentAssetAmount
+        ) {
             $_SESSION['errors']['transaction'] [] =
-                'You do not have enough coins to sell this amount!';
+                'You do not have enough coins to spend this amount!';
         }
 
-        $this->transactionValue($fiatAmount);
-        // if is BUY order and user does not have enough FIAT balance
-        if ($transactionType == 'buy' && $fiatAmount > $userFiatBalance) {
+        // if is BUY or SHORT order and user does not have enough FIAT balance
+        if (($transactionType == 'buy' || $transactionType == 'short')
+            && $fiatAmount > $userFiatBalance) {
             $_SESSION['errors']['transaction'] [] =
-                'You do not have enough money to buy this amount of coins!';
+                'You do not have enough money to purchase this amount of coins!';
         }
     }
 
     public function transactionValue(
-        $fiatAmount
+        float $fiatAmount,
+        ?float $assetAmount = 1
     )
     {
-        if ($fiatAmount < 0 || !$fiatAmount) {
+        if ($fiatAmount < 0
+            || !$fiatAmount
+            || $assetAmount < 0) {
             $_SESSION['errors']['transaction'] [] =
                 'Transaction error';
         }

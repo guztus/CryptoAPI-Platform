@@ -8,7 +8,7 @@ class UserAssetsViewVariables implements ViewVariablesInterface
 {
     public function getName(): string
     {
-        return 'userAsset';
+        return 'asset';
     }
 
     public function getValue(): array
@@ -18,13 +18,18 @@ class UserAssetsViewVariables implements ViewVariablesInterface
             $assetShort = (new UserAssetsRepository())->getSingleAsset($_SESSION['auth_id'], $_GET['search'], 'short');
 
             if ($asset) {
-                return [
+                $standardAssetInformation[] = [
                     'amount' => $asset->getAmount() ?? null,
                     'average_cost' => $asset->getAverageCost() ?? null,
+                ];
+            }
+            if ($assetShort) {
+                $shortAssetInformation[] = [
                     'short_amount' => $assetShort->getAmount() ?? null,
                     'short_average_cost' => $assetShort->getAverageCost() ?? null,
                 ];
             }
+            return array_merge($standardAssetInformation[0] ?? [], $shortAssetInformation[0] ?? []);
         }
         return [];
     }

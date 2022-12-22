@@ -28,6 +28,13 @@ class TransactionBuySellService
         float  $assetAmount
     )
     {
+        if ($transactionType == 'close') {
+            $transactionType = 'closeShort';
+            $assetType = 'short';
+        } else if ($transactionType == 'short') {
+            $assetType = 'short';
+        }
+
         $currentCoinPrice = ((new CoinsService($this->coinsRepository))->execute($symbol))->getPrice();
 
         $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol));
@@ -36,31 +43,36 @@ class TransactionBuySellService
         $userFiatBalance = $currentUser->getFiatBalance();
 
         if ($transactionType == 'closeShort') {
-            $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol, 'short'));
-//            (((avg-current)/avg)+1)*avg*amount
-            $fiatAmount = ((((($userAssetsRepository->getAverageCost() - $currentCoinPrice)
-                        / $userAssetsRepository->getAverageCost())) + 1)
-                * ($userAssetsRepository->getAverageCost()
-                    * $assetAmount));
-//            $fiatAmount = ($assetAmount * $currentCoinPrice) * -1;
+            $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol, $assetType ?? null));
+
+            if (!$userAssetsRepository) {
+                   die;
+            }
+//            var_dump($userAssetsRepository->getAverageCost());die;
+
+            $fiatAmount = (($userAssetsRepository->getAmount() * $userAssetsRepository->getAverageCost()) +
+                (($userAssetsRepository->getAmount() * $userAssetsRepository->getAverageCost()) *
+                    ((($userAssetsRepository->getAverageCost() - $currentCoinPrice) / $currentCoinPrice))));
 
         } else {
             $fiatAmount = $assetAmount * $currentCoinPrice;
         }
 
-//        (new Validator())->buySellTransaction(
-//            $userId,
-//            $transactionType,
-//            $symbol,
-//            $fiatAmount,
-//            $currentCoinPrice,
-//            $userFiatBalance,
-//        );
+        (new Validator())->buySellTransaction(
+            $userId,
+            $transactionType,
+            $symbol,
+            $assetType ?? null,
+            $fiatAmount,
+            $assetAmount,
+            $currentCoinPrice,
+            $userFiatBalance,
+        );
 
         // if didn't pass Validation, errors will be from in Validator class
-//        if (!Validator::passed()) {
-//            return;
-//        }
+        if (!Validator::passed()) {
+            return;
+        }
 
         // if all is ok, create transaction & modify assets
         $_SESSION['alerts']['transaction'] [] =
@@ -94,7 +106,8 @@ class TransactionBuySellService
         }
 
         $oldDollarCostAverage = (new UserAssetsRepository())->getOldDollarCostAverage($userId, $symbol, $type);
-        $purchaseDollarCostAverage = $fiatAmount / $assetAmount;
+
+        $purchaseDollarCostAverage = $fiatAmount*(-1) / $assetAmount;
 
         (new UserAssetsRepository())
             ->modifyAssets(

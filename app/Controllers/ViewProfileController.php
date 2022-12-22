@@ -76,6 +76,9 @@ class ViewProfileController
         $_SESSION['alerts']['success'] [] =
             "Successfully sent {$_POST['coinAmount']} {$_POST['symbol']} to user #{$_POST['receivingUserId']}!";
 
+        $_POST['coinAmount'] = $_POST['coinAmount'] * (-1);
+        var_dump($_POST['coinAmount']);
+
         (new TransactionSendReceiveService())->execute(
             $_SESSION['auth_id'],
             $_POST['receivingUserId'],
@@ -83,6 +86,9 @@ class ViewProfileController
             $_POST['symbol'],
             $_POST['coinAmount'],
         );
+
+        $_POST['coinAmount'] = $_POST['coinAmount'] * (-1);
+        var_dump($_POST['coinAmount']);die;
 
         (new TransactionSendReceiveService())->execute(
             $_POST['receivingUserId'],

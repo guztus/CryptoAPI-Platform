@@ -6,8 +6,6 @@ use App\Database;
 use App\Models\Asset;
 use App\Models\Collections\AssetCollection;
 use App\Repositories\Coins\CoinsRepository;
-use App\Services\CoinsService;
-use App\Services\User\UserGetInformationService;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
@@ -21,7 +19,6 @@ class UserAssetsRepository
     {
         $this->coinsRepository = $coinsRepository;
         $this->database = (new Database())->getConnection();
-        $this->queryBuilder = $this->database->createQueryBuilder();
     }
 
     public function modifyAssets(
@@ -44,7 +41,7 @@ class UserAssetsRepository
         }
 
         // check if user has any assets of this type
-        $userHasThisAsset = $this->queryBuilder
+        $userHasThisAsset = $this->database->createQueryBuilder()
             ->select('*')
             ->from('user_assets')
             ->where('user_id = ?')
@@ -55,9 +52,11 @@ class UserAssetsRepository
             ->setParameter(2, $type)
             ->fetchAssociative();
 
+        $previousValue = $userHasThisAsset['amount'] ?? 0;
+
         // if they don't, create a new asset
         if (empty($userHasThisAsset)) {
-            $query = $this->queryBuilder
+            $checkIfUserHasAsset = $this->database->createQueryBuilder()
                 ->insert('user_assets')
                 ->values([
                     'user_id' => '?',
@@ -71,31 +70,59 @@ class UserAssetsRepository
                 ->setParameter(2, $symbol)
                 ->setParameter(3, $amount)
                 ->setParameter(4, $price);
-            $query->executeQuery();
+
+            $checkIfUserHasAsset->executeQuery();
         } else {
-            if ($amount > 0) {
+            var_dump($oldDollarCostAverage);
+            if ($operation != 'send') {
+                if ($amount > 0) {
+                    $newDollarCostAverage =
+                        (($userHasThisAsset['amount'] * $oldDollarCostAverage) + ($purchaseDollarCostAverage * $amount))
+                        / ($userHasThisAsset['amount'] + $amount) . " ";
+                } else {
+                    $newDollarCostAverage = $oldDollarCostAverage;
+                }
+            } else {
                 $newDollarCostAverage = $oldDollarCostAverage;
-            } else if ($amount < 0) {
-                $newDollarCostAverage = ($oldDollarCostAverage + $purchaseDollarCostAverage) / 2;
             }
 
-            $sql = "UPDATE user_assets SET amount = amount +'$amount' WHERE user_id = '$userId' AND symbol = '$symbol' AND type = '$type'";
-            $this->database->executeQuery($sql);
+//            $sql = "UPDATE user_assets SET amount = amount +'$amount' WHERE user_id = '$userId' AND symbol = '$symbol' AND type = '$type'";
+//            $this->database->executeQuery($sql);
+//
+//            $sql = "UPDATE user_assets SET average_cost = '$newDollarCostAverage' WHERE user_id = '$userId' AND symbol = '$symbol' AND type = '$type'";
+//            $this->database->executeQuery($sql);
 
-//            $query = $this->queryBuilder
-//                ->update('user_assets')
-//                ->set('amount', "amount $operator $amount")
-//                ->set('average_cost', $newDollarCostAverage)
-//                ->where('user_id = ?', 'symbol = ?')
-//                ->setParameter(0, $userId)
-//                ->setParameter(1, $symbol);
-//            $query->executeQuery();
+            $newValue = $previousValue + $amount;
+
+            if ($newValue <= 0) {
+                $this->deleteAsset($userId, $symbol, $type);
+            }
+
+            $updateAmount = $this->database->createQueryBuilder()
+                ->update('user_assets')
+                ->set('amount', "amount + $amount")
+                ->where('user_id = ?', 'symbol = ?', 'type = ?')
+                ->setParameter(0, $userId)
+                ->setParameter(1, $symbol)
+                ->setParameter(2, $type);
+
+            $updateAmount->executeQuery();
+
+            $updateAverage = $this->database->createQueryBuilder()
+                ->update('user_assets')
+                ->set('average_cost', "$newDollarCostAverage")
+                ->where('user_id = ?', 'symbol = ?', 'type = ?')
+                ->setParameter(0, $userId)
+                ->setParameter(1, $symbol)
+                ->setParameter(2, $type);
+
+            $updateAverage->executeQuery();
         }
     }
 
     public function getAssetList(int $userId): ?AssetCollection
     {
-        $rawAssetList = $this->queryBuilder
+        $rawAssetList = $this->database->createQueryBuilder()
             ->select('*')
             ->from('user_assets')
             ->where('user_id = ?')
@@ -130,7 +157,7 @@ class UserAssetsRepository
 
     public function getSingleAsset(int $userId, string $symbol, ?string $type = 'standard'): ?Asset
     {
-        $rawAsset = $this->queryBuilder
+        $rawAsset = $this->database->createQueryBuilder()
             ->select('*')
             ->from('user_assets')
             ->where('user_id = ?')
@@ -154,7 +181,11 @@ class UserAssetsRepository
 
     public function getAssetAmount(int $userId, string $symbol, ?string $type = 'standard'): float
     {
-        $asset = $this->queryBuilder
+        if ($type == null) {
+            $type = 'standard';
+        }
+
+        $asset = $this->database->createQueryBuilder()
             ->select('amount')
             ->from('user_assets')
             ->where('user_id = ?')
@@ -170,7 +201,7 @@ class UserAssetsRepository
 
     public function getOldDollarCostAverage(int $userId, string $symbol, ?string $type = 'standard'): ?float
     {
-        $asset = $this->queryBuilder
+        $asset = $this->database->createQueryBuilder()
             ->select('average_cost')
             ->from('user_assets')
             ->where('user_id = ?')
@@ -186,5 +217,26 @@ class UserAssetsRepository
         }
 
         return (float)$asset['average_cost'];
+    }
+
+    private function deleteAsset(
+        int     $userId,
+        string  $symbol,
+        ?string $type = 'standard'
+    )
+    {
+        if ($type == null) {
+            $type = 'standard';
+        }
+
+        $query = $this->database->createQueryBuilder()
+            ->delete('user_assets')
+            ->where('user_id = ?')
+            ->andWhere('symbol = ?')
+            ->andWhere('type = ?')
+            ->setParameter(0, $userId)
+            ->setParameter(1, $symbol)
+            ->setParameter(2, $type);
+        $query->executeQuery();
     }
 }

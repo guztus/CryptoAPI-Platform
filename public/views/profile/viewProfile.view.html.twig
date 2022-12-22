@@ -159,7 +159,7 @@
                                                     {% if asset.amount == 0 %}
                                                     {% else %}
                                                         <option id="selected_coin" value="{{ asset.symbol }}"
-                                                                style="text-align: left">{{ asset.symbol }}</option>
+                                                                style="text-align: left">{{ asset.symbol }}{% if asset.type == 'short' %}({{ asset.type }}){% endif %}</option>
                                                     {% endif %}
                                                 {% endfor %}
                                             </select>
@@ -196,7 +196,7 @@
                                                     <tr>
                                                         <td class="centered">
                                                             <a class="orangeUnderLine">
-                                                                {{ asset.symbol }}
+                                                                {{ asset.symbol }}{% if asset.type == 'short' %}({{ asset.type }}){% endif %}
                                                             </a>
                                                         </td>
                                                         <td>

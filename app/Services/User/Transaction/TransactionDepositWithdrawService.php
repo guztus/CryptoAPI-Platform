@@ -16,6 +16,10 @@ class TransactionDepositWithdrawService
         $fiatAmount
     ): void
     {
+        if ($transactionType == 'withdraw') {
+            $fiatAmount = $fiatAmount * (-1);
+        }
+
         $transaction = new Transaction(
             TransactionIdGenerator::get(),
             $userId,

@@ -59,7 +59,7 @@
         }
 
         function coinSetMaxFiatAmount() {
-            document.getElementById('input_coin_amount').value = "{{ userAsset.amount }}";
+            document.getElementById('input_coin_amount').value = "{{ asset.amount }}";
             fiatChangeLive();
         }
 
@@ -173,7 +173,7 @@
                 </table>
 
                 {% if auth.id %}
-                {{ userAsset.type }}
+                {{ asset.type }}
 
                 <div style="border:1px solid lightgray; padding: 1em; margin-top: 1em; border-radius: 5px">
                     <div style="padding-bottom: 1em; margin-bottom: 1.5em">
@@ -183,16 +183,16 @@
                                     <a style="font-weight: bold; font-size: 0.9em">You Own:
                                         <span
                                                 class="monospace"
-                                                style="font-weight: normal">{{ userAsset.amount|number_format(6, '.', ',') }}
+                                                style="font-weight: normal">{{ asset.amount|number_format(6, '.', ',') }}
                                             </span>{{ coin.symbol }}
                                     </a>
                                 </div>
 
-                                {% if userAsset.amount != 0 %}
+                                {% if asset.amount != 0 %}
                                 <div style="margin-left: auto">
                                         <span style="font-weight: bold; font-size: 0.8em"> ($<span
                                                     class="monospace"
-                                            >{{ (userAsset.amount * coin.price)|number_format(2, '.', ',') }})</span>
+                                            >{{ (asset.amount * coin.price)|number_format(2, '.', ',') }})</span>
                                                                 </span>
                                 </div>
 
@@ -200,7 +200,7 @@
                             <div style="text-align: right">
                                 <a style="font-size: 0.8em">
                                     (Avg. cost: <span
-                                            class="monospace">{{ userAsset.average_cost|number_format(6, '.', ',') }}</span>)
+                                            class="monospace">{{ asset.average_cost|number_format(6, '.', ',') }}</span>)
                                 </a>
                             </div>
                             {% else %}
@@ -214,27 +214,25 @@
                                 <a style="font-weight: bold; font-size: 0.9em">Short:
                                     <span
                                             class="monospace"
-                                            style="font-weight: normal">{{ userAsset.short_amount|number_format(6, '.', ',') }}
+                                            style="font-weight: normal">{{ asset.short_amount|number_format(6, '.', ',') }}
                                 </span>{{ coin.symbol }}
                                 </a>
                             </div>
 
-                            {% if userAsset.amount != 0 %}
+                            {% if asset.short_amount != 0 %}
 
                             <div style="margin-left: auto">
                                 <span style="font-weight: bold; font-size: 0.8em"> ($<span
                                             class="monospace"
-                                    >{{ ((((userAsset.short_average_cost - coin.price)
-                                        / userAsset.short_average_cost) +1)
-                                        * userAsset.short_average_cost
-                                        * userAsset.short_amount)|number_format(2, '.', ',') }})</span>
+                                    >{{ ((asset.short_amount*asset.short_average_cost)+((asset.short_amount*asset.short_average_cost)*(((asset.short_average_cost - coin.price)
+                                        / coin.price))))|number_format(2, '.', ',') }})</span>
                                                                 </span>
                             </div>
                         </div>
                         <div style="text-align: right">
                             <a style="font-size: 0.8em">
                                 (Avg. cost: <span
-                                        class="monospace">{{ userAsset.short_average_cost|number_format(6, '.', ',') }}</span>)
+                                        class="monospace">{{ asset.short_average_cost|number_format(6, '.', ',') }}</span>)
                             </a>
                         </div>
                         {% else %}
@@ -254,7 +252,6 @@
 
             <div id="accordion">
                 <div style="text-align: center">
-                    <p>
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#collapseExample">
                             Buy/Sell
@@ -263,7 +260,6 @@
                                 data-bs-target="#collapseExample2">
                             Short
                         </button>
-                    </p>
                 </div>
 
 
@@ -291,7 +287,7 @@
                                    onmouseover="fiatSetMaxCoinAmount()"
                                    onmouseleave="fiatSetDefaultText()" min="0">
                         </div>
-                        <div class="collapse" id="collapseExample" data-bs-parent="#accordion">
+                        <div class="collapse show" id="collapseExample" data-bs-parent="#accordion">
                             <div class="d-flex" style="padding-right: 4em; padding-left: 4em">
                                 <div>
                                     <input type="submit" name="transactionType" value="buy"
