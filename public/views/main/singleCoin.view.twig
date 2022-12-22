@@ -176,150 +176,154 @@
                 {{ userAsset.type }}
 
                 <div style="border:1px solid lightgray; padding: 1em; margin-top: 1em; border-radius: 5px">
-                    <div style="border-bottom: 1px solid lightgray; padding-bottom: 1em; margin-bottom: 1.5em">
+                    <div style="padding-bottom: 1em; margin-bottom: 1.5em">
+                        <div style="border-bottom: 1px solid lightgray; padding-bottom: 1em">
+                            <div class="d-flex">
+                                <div>
+                                    <a style="font-weight: bold; font-size: 0.9em">You Own:
+                                        <span
+                                                class="monospace"
+                                                style="font-weight: normal">{{ userAsset.amount|number_format(6, '.', ',') }}
+                                            </span>{{ coin.symbol }}
+                                    </a>
+                                </div>
+
+                                {% if userAsset.amount != 0 %}
+                                <div style="margin-left: auto">
+                                        <span style="font-weight: bold; font-size: 0.8em"> ($<span
+                                                    class="monospace"
+                                            >{{ (userAsset.amount * coin.price)|number_format(2, '.', ',') }})</span>
+                                                                </span>
+                                </div>
+
+                            </div>
+                            <div style="text-align: right">
+                                <a style="font-size: 0.8em">
+                                    (Avg. cost: <span
+                                            class="monospace">{{ userAsset.average_cost|number_format(6, '.', ',') }}</span>)
+                                </a>
+                            </div>
+                            {% else %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div style="border-bottom: 1px solid lightgray; margin-top: 1em; padding-bottom: 1em">
                         <div class="d-flex">
                             <div>
-                                <a style="font-weight: bold; font-size: 0.9em">You Own:
+                                <a style="font-weight: bold; font-size: 0.9em">Short:
                                     <span
                                             class="monospace"
-                                            style="font-weight: normal">{{ userAsset.amount|number_format(6, '.', ',') }}
-                            </span>{{ coin.symbol }}
-                            </div>
-                            <div style="margin-left: auto">
-                                <span style="font-size: 0.9em"> ($<span
-                                            class="monospace"
-                                    >{{ (userAsset.amount * coin.price)|number_format(2, '.', ',') }})</span>
-                                                                </span>
+                                            style="font-weight: normal">{{ userAsset.short_amount|number_format(6, '.', ',') }}
+                                </span>{{ coin.symbol }}
                                 </a>
+                            </div>
+
+                            {% if userAsset.amount != 0 %}
+
+                            <div style="margin-left: auto">
+                                <span style="font-weight: bold; font-size: 0.8em"> ($<span
+                                            class="monospace"
+                                    >{{ ((((userAsset.short_average_cost - coin.price)
+                                        / userAsset.short_average_cost) +1)
+                                        * userAsset.short_average_cost
+                                        * userAsset.short_amount)|number_format(2, '.', ',') }})</span>
+                                                                </span>
                             </div>
                         </div>
                         <div style="text-align: right">
                             <a style="font-size: 0.8em">
                                 (Avg. cost: <span
-                                        class="monospace">{{ userAsset.average_cost|number_format(6, '.', ',') }}</span>)
+                                        class="monospace">{{ userAsset.short_average_cost|number_format(6, '.', ',') }}</span>)
                             </a>
                         </div>
-                        <div style=" margin-top: 0.5em">
-                            <a style="font-weight: bold; font-size: 0.9em">
-                                FIAT Balance: <span style="font-weight: normal">$ <span
-                                            class="monospace orangeUnderLine">{{ auth.fiatBalance|number_format(2, '.', ',') }}</span></span>
-                            </a>
-                        </div>
+                        {% else %}
                     </div>
+                    {% endif %}
+                </div>
 
-                    <div id="accordion">
-                        <div style="text-align: center">
-                            <p>
-                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseExample">
-                                    Buy/Sell
-                                </button>
-                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseExample2">
-                                    Short
-                                </button>
-                            </p>
+                <div style="border-bottom: 1px solid lightgray; margin-top: 1em; padding-bottom: 1em">
+                    <div style=" margin-top: 0.5em">
+                        <a style="font-weight: bold; font-size: 0.9em">
+                            FIAT Balance: <span style="font-weight: normal">$ <span
+                                        class="monospace orangeUnderLine">{{ auth.fiatBalance|number_format(2, '.', ',') }}</span></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="accordion">
+                <div style="text-align: center">
+                    <p>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseExample">
+                            Buy/Sell
+                        </button>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseExample2">
+                            Short
+                        </button>
+                    </p>
+                </div>
+
+
+                <div class="d-flex" style="margin-right: 3em; margin-left: 3em">
+                    <form class="my-2" method="POST">
+                        <input name="symbol" value="{{ coin.symbol }}" type="hidden">
+                        <input name="transactionType" value="buy" type="hidden">
+                        <div class="input-group mb-3">
+                            <input id="input_coin_amount" type="number" step="0.000000001" name="coinAmount"
+                                   class="form-control" oninput="fiatChangeLive()"
+                                   onmouseover="coinSetMaxCoinAmount()"
+                                   onmouseleave="coinSetDefaultText()" min="0">
+                            <span class="input-group-text" id="coin_amount"
+                                  onmousedown="coinSetMaxFiatAmount()"
+                                  onmouseenter="coinSetMaxCoinAmount()"
+                                  onmouseleave="coinSetDefaultText()">{{ coin.symbol }}</span>
                         </div>
-
-                        <div class="collapse" id="collapseExample" data-bs-parent="#accordion">
-
-                            <div class="d-flex" style="margin-right: 3em; margin-left: 3em">
-                                <form class="my-2" method="POST">
-                                    <input name="symbol" value="{{ coin.symbol }}" type="hidden">
-                                    <input name="transactionType" value="buy" type="hidden">
-                                    <div class="input-group mb-3">
-                                        <input id="input_coin_amount" type="number" step="0.000000001" name="coinAmount"
-                                               class="form-control" oninput="fiatChangeLive()"
-                                               onmouseover="coinSetMaxCoinAmount()"
-                                               onmouseleave="coinSetDefaultText()" min="0">
-                                        <span class="input-group-text" id="coin_amount"
-                                              onmousedown="coinSetMaxFiatAmount()"
-                                              onmouseenter="coinSetMaxCoinAmount()"
-                                              onmouseleave="coinSetDefaultText()">{{ coin.symbol }}</span>
-                                    </div>
-                                    <div class="input-group mb-3">
+                        <div class="input-group mb-3">
                                             <span class="input-group-text" id="fiat_amount"
                                                   onmousedown="fiatSetMaxFiatAmount()"
                                                   onmouseenter="fiatSetMaxCoinAmount()"
                                                   onmouseleave="fiatSetDefaultText()">&nbsp $ &nbsp</span>
-                                        <input id="input_fiat_amount" type="number" step="0.01"
-                                               class="form-control" oninput="amountChangeLive()"
-                                               onmouseover="fiatSetMaxCoinAmount()"
-                                               onmouseleave="fiatSetDefaultText()" min="0">
-                                    </div>
-                                    <div class="d-flex" style="padding-right: 4em; padding-left: 4em">
-                                        <div>
-                                            <input type="submit" name="transactionType" value="buy"
-                                                   class="btn btn-primary my-2">
-                                        </div>
-                                        <div>
-                                            <input type="submit" name="transactionType" value="short"
-                                                   class="btn btn-primary my-2">
-                                        </div>
-                                        <div>
-                                            <input type="submit" name="transactionType" value="closeShort"
-                                                   class="btn btn-primary my-2">
-                                        </div>
-                                        <div style="margin-left: auto">
-                                            <input type="submit" name="transactionType" value="sell"
-                                                   class="btn btn-primary my-2">
-                                        </div>
-                                    </div>
-                                </form>
+                            <input id="input_fiat_amount" type="number" step="0.01"
+                                   class="form-control" oninput="amountChangeLive()"
+                                   onmouseover="fiatSetMaxCoinAmount()"
+                                   onmouseleave="fiatSetDefaultText()" min="0">
+                        </div>
+                        <div class="collapse" id="collapseExample" data-bs-parent="#accordion">
+                            <div class="d-flex" style="padding-right: 4em; padding-left: 4em">
+                                <div>
+                                    <input type="submit" name="transactionType" value="buy"
+                                           class="btn btn-primary my-2">
+                                </div>
+                                <div style="margin-left: auto">
+                                    <input type="submit" name="transactionType" value="sell"
+                                           class="btn btn-primary my-2">
+                                </div>
                             </div>
-
-                            Buy/Sell
                         </div>
 
-{#                        <div class="collapse" id="collapseExample2" data-bs-parent="#accordion">#}
-
-{#                            <div class="d-flex" style="margin-right: 3em; margin-left: 3em">#}
-{#                                <form class="my-2" method="POST">#}
-{#                                    <input name="symbol" value="{{ coin.symbol }}" type="hidden">#}
-{#                                    <input name="transactionType" value="buy" type="hidden">#}
-{#                                    <div class="input-group mb-3">#}
-{#                                        <input id="input_coin_amount" type="number" step="0.000000001"#}
-{#                                               class="form-control" oninput="fiatChangeLive()"#}
-{#                                               onmouseover="coinSetMaxCoinAmount()"#}
-{#                                               onmouseleave="coinSetDefaultText()" min="0">#}
-{#                                        <span class="input-group-text" id="coin_amount"#}
-{#                                              onmousedown="coinSetMaxFiatAmount()"#}
-{#                                              onmouseenter="coinSetMaxCoinAmount()"#}
-{#                                              onmouseleave="coinSetDefaultText()">{{ coin.symbol }}</span>#}
-{#                                    </div>#}
-{#                                    <div class="input-group mb-3">#}
-{#                                            <span class="input-group-text" id="fiat_amount"#}
-{#                                                  onmousedown="fiatSetMaxFiatAmount()"#}
-{#                                                  onmouseenter="fiatSetMaxCoinAmount()"#}
-{#                                                  onmouseleave="fiatSetDefaultText()">&nbsp $ &nbsp</span>#}
-{#                                        <input id="input_fiat_amount" type="number" name="fiatAmount" step="0.01"#}
-{#                                               class="form-control" oninput="amountChangeLive()"#}
-{#                                               onmouseover="fiatSetMaxCoinAmount()"#}
-{#                                               onmouseleave="fiatSetDefaultText()" min="0">#}
-{#                                    </div>#}
-{#                                    <div class="d-flex" style="padding-right: 4em; padding-left: 4em">#}
-{#                                        <div>#}
-{#                                            <input type="submit" name="transactionType" value="short"#}
-{#                                                   class="btn btn-primary my-2">#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </form>#}
-{#                            </div>#}
-
-{#                            Shorting#}
-{#                        </div>#}
-                    </div>
-
-                    <div style="border-top: 1px solid lightgray; padding-bottom: 1em; margin-bottom: 1.5em">
-                        <div class="d-flex">
-                            <h6>Open short positions:</h6>
+                        <div class="collapse" id="collapseExample2" data-bs-parent="#accordion">
+                            <div class="d-flex" style="padding-right: 3em; padding-left: 3em">
+                                <div>
+                                    <input type="submit" name="transactionType" value="short"
+                                           class="btn btn-primary my-2">
+                                </div>
+                                <div style="margin-left: auto">
+                                    <input type="submit" name="transactionType" value="close"
+                                           class="btn btn-primary my-2">
+                                </div>
+                            </div>
                         </div>
 
-                    </div>
-                    {% endif %}
+                    </form>
                 </div>
+
             </div>
         </div>
+
+        {% endif %}
     </div>
 </div>
 

@@ -37,18 +37,17 @@ class TransactionBuySellService
 
         if ($transactionType == 'closeShort') {
             $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol, 'short'));
+//            (((avg-current)/avg)+1)*avg*amount
             $fiatAmount = ((((($userAssetsRepository->getAverageCost() - $currentCoinPrice)
                         / $userAssetsRepository->getAverageCost())) + 1)
                 * ($userAssetsRepository->getAverageCost()
                     * $assetAmount));
+//            $fiatAmount = ($assetAmount * $currentCoinPrice) * -1;
 
         } else {
             $fiatAmount = $assetAmount * $currentCoinPrice;
         }
 
-//        var_dump($givenAmount);
-//var_dump($assetAmount);die;
-//
 //        (new Validator())->buySellTransaction(
 //            $userId,
 //            $transactionType,
@@ -70,6 +69,8 @@ class TransactionBuySellService
 //        var_dump($_POST);die;
         if ($transactionType == 'buy' || $transactionType == 'short') {
             $fiatAmount = $fiatAmount * (-1);
+        } else {
+            $assetAmount = $assetAmount * (-1);
         }
 
         $transaction = new Transaction(
@@ -86,7 +87,13 @@ class TransactionBuySellService
         (new UserTransactionHistoryRepository())
             ->add($transaction);
 
-        $oldDollarCostAverage = (new UserAssetsRepository())->getOldDollarCostAverage($userId, $symbol);
+        if ($transactionType == 'short' || $transactionType == 'closeShort') {
+            $type = 'short';
+        } else {
+            $type = 'standard';
+        }
+
+        $oldDollarCostAverage = (new UserAssetsRepository())->getOldDollarCostAverage($userId, $symbol, $type);
         $purchaseDollarCostAverage = $fiatAmount / $assetAmount;
 
         (new UserAssetsRepository())
@@ -104,7 +111,6 @@ class TransactionBuySellService
             ->modifyFiatBalance(
                 $transaction->getUserId(),
                 $transaction->getOrderSum(),
-                $transaction->getTransactionType()
             );
     }
 }

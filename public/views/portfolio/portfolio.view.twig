@@ -90,7 +90,15 @@
             {% set assetsTotalSum = assetsTotalSum + asset.currentPrice * asset.amount %}
             {% set totalAssetCount = totalAssetCount + 1 %}
             {#            (((asset.currentPrice-asset.averageCost)/asset.averageCost)*100) #}
-            {% set totalProfitLoss = totalProfitLoss + (((asset.currentPrice-asset.averageCost)/asset.averageCost)*100) %}
+
+            {% if asset.type == 'short' %}
+                {% set totalProfitLoss = totalProfitLoss + (((asset.averageCost - asset.currentPrice)
+                    / asset.averageCost)*100) %}
+            {% else %}
+                {% set totalProfitLoss = totalProfitLoss + (((asset.currentPrice - asset.averageCost)
+                    / asset.averageCost)*100) %}
+            {% endif %}
+
         {% endfor %}
 
         <h6>
@@ -125,7 +133,7 @@
             <th>Amount</th>
             <th>$ Amount</th>
             <th>% Profit/Loss</th>
-{#            <th>$ Profit/Loss</th>#}
+            {#            <th>$ Profit/Loss</th> #}
         </tr>
         </thead>
         <tbody>
@@ -135,7 +143,7 @@
                 <tr>
                     <td class="centered">
                         <a href="/?search={{ asset.symbol }}" class="orangeUnderLine">
-                            {{ asset.symbol }}{% if asset.type %}({{ asset.type }}){% endif %}
+                            {{ asset.symbol }}{% if asset.type == 'short' %}({{ asset.type }}){% endif %}
                         </a>
                     </td>
                     <td>${{ asset.currentPrice|number_format(6, '.', ',') }}</td>
@@ -143,20 +151,38 @@
                     <td>{{ asset.amount|number_format(6, '.', ',') }}</td>
 
                     {% if asset.type == 'short' %}
-                        <td>${{ (asset.amount*asset.averageCost) +
-                            (asset.amount*asset.averageCost) *
-                            (((asset.averageCost-asset.currentPrice)/asset.averageCost))
+                        {#                        <td> #}
+                        {#                            ${{ (asset.amount*asset.currentPrice)|number_format(2, '.', ',') }} #}
+                        {#                        </td> #}
+                        {#                        (((avg-current)/avg)+1)*avg*amount #}
+                        <td>
+                            $
+                            {{ ((((asset.averageCost - asset.currentPrice)
+                            / asset.averageCost) +1)
+                            * asset.averageCost
+                            * asset.amount)
                             |number_format(2, '.', ',') }}
                         </td>
+
+                        {#                        <td> #}
+                        {#                            $ #}
+                        {#                            {{ #}
+                        {#                            (asset.amount*asset.averageCost) + #}
+                        {#                            ((asset.amount*asset.averageCost) * #}
+                        {#                            ((asset.averageCost-asset.currentPrice)/asset.averageCost)) #}
+                        {#                            |number_format(2, '.', ',') }} #}
+                        {#                        </td> #}
 
                         <td>
                             {% if asset.currentPrice > asset.averageCost %}
                                 <span class="text-danger">
-                            {{ (((asset.averageCost-asset.currentPrice)/asset.averageCost)*100)|number_format(2, '.', ',') }} ▼
+                            {{ (((asset.currentPrice-asset.averageCost)
+                            /asset.averageCost)*100)|number_format(2, '.', ',') }} ▼
                         </span>
                             {% else %}
                                 <span class="text-success">
-                            +{{ (((asset.averageCost-asset.currentPrice)/asset.averageCost)*100)|number_format(2, '.', ',') }} ▲
+                            +{{ (((asset.averageCost - asset.currentPrice)
+                                    / asset.averageCost)*100)|number_format(2, '.', ',') }} ▲
                         </span>
                             {% endif %}
                         </td>
@@ -176,88 +202,22 @@
                         </td>
                     {% endif %}
 
-{#                    <td>#}
-{#                        {% if asset.currentPrice > asset.averageCost %}#}
-{#                            <span class="text-success">#}
-{#                            +${{ ((asset.currentPrice-asset.averageCost)*asset.amount)|number_format(2, '.', ',') }}#}
-{#                        </span>#}
-{#                        {% else %}#}
-{#                            <span class="text-danger">#}
-{#                            -${{ ((asset.averageCost-asset.currentPrice)*asset.amount)|number_format(2, '.', ',') }}#}
-{#                        </span>#}
-{#                        {% endif %}#}
-{#                    </td>#}
+                    {#                    <td> #}
+                    {#                        {% if asset.currentPrice > asset.averageCost %} #}
+                    {#                            <span class="text-success"> #}
+                    {#                            +${{ ((asset.currentPrice-asset.averageCost)*asset.amount)|number_format(2, '.', ',') }} #}
+                    {#                        </span> #}
+                    {#                        {% else %} #}
+                    {#                            <span class="text-danger"> #}
+                    {#                            -${{ ((asset.averageCost-asset.currentPrice)*asset.amount)|number_format(2, '.', ',') }} #}
+                    {#                        </span> #}
+                    {#                        {% endif %} #}
+                    {#                    </td> #}
                 </tr>
             {% endif %}
         {% endfor %}
         </tbody>
     </table>
-</div>
-
-<div class="container mt-3">
-
-    <div style="text-align: center">
-        <h2>Short Positions:</h2>
-
-        {#        <h6> #}
-        {#            Asset Count: <span class="monospace orangeUnderLine">{{ totalAssetCount|number_format(0, '.', ',') }}</span> #}
-        {#        </h6> #}
-    </div>
-
-    {#    <table class="sortable table table-light table-striped table-hover table-condensed" #}
-    {#           style="border-radius: 10px; overflow: hidden; margin-top: 2em; margin-bottom: 6em"> #}
-    {#        <thead> #}
-    {#        <tr> #}
-    {#            <th class="centered">Symbol</th> #}
-    {#            <th>Current Price</th> #}
-    {#            <th>Short Price</th> #}
-    {#            <th>Amount</th> #}
-    {#            <th>$ Amount</th> #}
-    {#            <th>% Profit/Loss</th> #}
-    {#            <th>$ Profit/Loss</th> #}
-    {#        </tr> #}
-    {#        </thead> #}
-    {#        <tbody> #}
-    {#        {% for asset in assetList %} #}
-    {#            {% if asset.amount == 0 %} #}
-    {#            {% else %} #}
-    {#                <tr> #}
-    {#                    <td class="centered"> #}
-    {#                        <a href="/?search={{ asset.symbol }}" class="orangeUnderLine"> #}
-    {#                            {{ asset.symbol }} #}
-    {#                        </a> #}
-    {#                    </td> #}
-    {#                    <td>${{ asset.currentPrice|number_format(6, '.', ',') }}</td> #}
-    {#                    <td>${{ asset.averageCost|number_format(6, '.', ',') }}</td> #}
-    {#                    <td>{{ asset.amount|number_format(6, '.', ',') }}</td> #}
-    {#                    <td>${{ (asset.amount*asset.currentPrice)|number_format(2, '.', ',') }}</td> #}
-    {#                    <td> #}
-    {#                        {% if asset.currentPrice > asset.averageCost %} #}
-    {#                            <span class="text-success"> #}
-    {#                            +{{ (((asset.currentPrice-asset.averageCost)/asset.averageCost)*100)|number_format(2, '.', ',') }} ▲ #}
-    {#                        </span> #}
-    {#                        {% else %} #}
-    {#                            <span class="text-danger"> #}
-    {#                            {{ (((asset.currentPrice-asset.averageCost)/asset.averageCost)*100)|number_format(2, '.', ',') }} ▼ #}
-    {#                        </span> #}
-    {#                        {% endif %} #}
-    {#                    </td> #}
-    {#                    <td> #}
-    {#                        {% if asset.currentPrice > asset.averageCost %} #}
-    {#                            <span class="text-success"> #}
-    {#                            +${{ ((asset.currentPrice-asset.averageCost)*asset.amount)|number_format(2, '.', ',') }} #}
-    {#                        </span> #}
-    {#                        {% else %} #}
-    {#                            <span class="text-danger"> #}
-    {#                            -${{ ((asset.averageCost-asset.currentPrice)*asset.amount)|number_format(2, '.', ',') }} #}
-    {#                        </span> #}
-    {#                        {% endif %} #}
-    {#                    </td> #}
-    {#                </tr> #}
-    {#            {% endif %} #}
-    {#        {% endfor %} #}
-    {#        </tbody> #}
-    {#    </table> #}
 </div>
 
 <div class="container mt-3">
@@ -277,7 +237,7 @@
         </thead>
         <tbody>
         {% for transaction in transactionHistory %}
-            {% if transaction.transactionType == 'sell' or transaction.transactionType == 'deposit' %}
+            {% if transaction.orderSum > 0 %}
                 <tr style="color: green">
             {% else %}
                 <tr style="color: #DD1515">
@@ -310,13 +270,13 @@
                 <td></td>
                 <td></td>
             {% endif %}
-            {% if transaction.transactionType == 'sell' or transaction.transactionType == 'deposit' %}
+            {% if transaction.orderSum > 0 %}
                 <td>
-                    +${{ transaction.orderSum|number_format(2, '.', ',') }}
+                    +$ {{ transaction.orderSum|number_format(2, '.', ',') }}
                 </td>
             {% else %}
                 <td>
-                    -${{ transaction.orderSum|number_format(2, '.', ',') }}
+                    -$ {{ ((transaction.orderSum)*(-1))|number_format(2, '.', ',') }}
                 </td>
             {% endif %}
             <td>

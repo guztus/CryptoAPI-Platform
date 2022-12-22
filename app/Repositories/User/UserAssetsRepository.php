@@ -73,14 +73,11 @@ class UserAssetsRepository
                 ->setParameter(4, $price);
             $query->executeQuery();
         } else {
-
-//            if ($operation === 'sell' || $operation === 'send' || $operation === 'closeShort') {
-//                $operator = '-';
-//                $newDollarCostAverage = $oldDollarCostAverage;
-//            } else if ($operation === 'buy' || $operation === 'receive'  || $operation === 'short'  ) {
-//                $operator = '+';
-//                $newDollarCostAverage = ($oldDollarCostAverage + $purchaseDollarCostAverage) / 2;
-//            }
+            if ($amount > 0) {
+                $newDollarCostAverage = $oldDollarCostAverage;
+            } else if ($amount < 0) {
+                $newDollarCostAverage = ($oldDollarCostAverage + $purchaseDollarCostAverage) / 2;
+            }
 
             $sql = "UPDATE user_assets SET amount = amount +'$amount' WHERE user_id = '$userId' AND symbol = '$symbol' AND type = '$type'";
             $this->database->executeQuery($sql);
@@ -155,29 +152,33 @@ class UserAssetsRepository
         return null;
     }
 
-    public function getAssetAmount(int $userId, string $symbol): float
+    public function getAssetAmount(int $userId, string $symbol, ?string $type = 'standard'): float
     {
         $asset = $this->queryBuilder
             ->select('amount')
             ->from('user_assets')
             ->where('user_id = ?')
             ->andWhere('symbol = ?')
+            ->andWhere('type = ?')
             ->setParameter(0, $userId)
             ->setParameter(1, $symbol)
+            ->setParameter(2, $type)
             ->fetchAssociative();
 
         return (float)$asset['amount'] ?? 0;
     }
 
-    public function getOldDollarCostAverage(int $userId, string $symbol): ?float
+    public function getOldDollarCostAverage(int $userId, string $symbol, ?string $type = 'standard'): ?float
     {
         $asset = $this->queryBuilder
             ->select('average_cost')
             ->from('user_assets')
             ->where('user_id = ?')
             ->andWhere('symbol = ?')
+            ->andWhere('type = ?')
             ->setParameter(0, $userId)
             ->setParameter(1, $symbol)
+            ->setParameter(2, $type)
             ->fetchAssociative();
 
         if (is_null($asset['average_cost'])) {

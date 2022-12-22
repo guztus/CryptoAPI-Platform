@@ -22,8 +22,8 @@ class PortfolioController
             return Redirect::to('/login');
         }
 
-        $displayData = (new PortfolioService($this->coinsRepository))->execute();
+        $portfolioData = (new PortfolioService($this->coinsRepository))->execute();
 
-        return Template::render('portfolio/portfolio.view.twig', ['displayData' => $displayData ?? []]);
+        return Template::render('portfolio/portfolio.view.twig', ['displayData' => $portfolioData ?? []]);
     }
 }
