@@ -4,7 +4,6 @@ namespace App\Repositories\User;
 
 use App\Database;
 use App\Models\User;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Connection;
 
 class UserRepository

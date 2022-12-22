@@ -22,17 +22,6 @@ class ProfileController
             return Redirect::to('/login');
         }
 
-//        $user->withdraw()
-//            (int)$_SESSION['auth_id'],
-//            $_POST['transactionType'],
-//            '$',
-//            (float)$_POST['fiatAmount'],
-//        );
-//
-//        	$user->withdrawBalance
-//        	$user->modifyAs...
-//            (`$this->userRepository->save($user)`) db – save($user) ..
-
         (new TransactionDepositWithdrawService())->execute(
             (int)$_SESSION['auth_id'],
             $_POST['transactionType'],

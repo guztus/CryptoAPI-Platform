@@ -37,19 +37,16 @@ class TransactionBuySellService
 
         $currentCoinPrice = ((new CoinsService($this->coinsRepository))->execute($symbol))->getPrice();
 
-        $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol));
-
         $currentUser = (new UserGetInformationService())->execute($userId);
         $userFiatBalance = $currentUser->getFiatBalance();
 
         if ($transactionType == 'closeShort') {
-            $userAssetsRepository = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol, $assetType ?? null));
+            $userOwnedAsset = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol, $assetType ?? null));
 
-            if (!$userAssetsRepository) {
+            if (!$userOwnedAsset) {
                 $fiatAmount = 0;
             } else {
-
-                $fiatAmount = (($userAssetsRepository->getAverageCost() - $currentCoinPrice) * $userAssetsRepository->getAmount());
+                $fiatAmount = (($userOwnedAsset->getAverageCost() - $currentCoinPrice) * $userOwnedAsset->getAmount());
             }
 
         } else if ($transactionType == 'short') {
@@ -68,7 +65,6 @@ class TransactionBuySellService
             $userFiatBalance,
         );
 
-        // if didn't pass Validation, errors will be from in Validator class
         if (!Validator::passed()) {
             return;
         }
