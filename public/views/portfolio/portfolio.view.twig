@@ -146,22 +146,29 @@
                             {{ asset.symbol }}{% if asset.type == 'short' %}({{ asset.type }}){% endif %}
                         </a>
                     </td>
-                    <td>${{ asset.currentPrice|number_format(6, '.', ',') }}</td>
-                    <td>${{ asset.averageCost|number_format(6, '.', ',') }}</td>
+                    <td>$ {{ asset.currentPrice|number_format(6, '.', ',') }}</td>
+                    <td>$ {{ asset.averageCost|number_format(6, '.', ',') }}</td>
                     <td>{{ asset.amount|number_format(6, '.', ',') }}</td>
 
                     {% if asset.type == 'short' %}
-                        {#                        <td> #}
-                        {#                            ${{ (asset.amount*asset.currentPrice)|number_format(2, '.', ',') }} #}
-                        {#                        </td> #}
-                        {#                        (((avg-current)/avg)+1)*avg*amount #}
                         <td>
                             $
-                            {{ ((((asset.averageCost - asset.currentPrice)
-                            / asset.averageCost) +1)
-                            * asset.averageCost
-                            * asset.amount)
+                            {{ ((asset.amount*asset.averageCost)+((asset.amount*asset.averageCost)*(((asset.averageCost - asset.currentPrice)
+                            / asset.currentPrice))))
                             |number_format(2, '.', ',') }}
+
+{#                            this is $ loss/profit !!!! #}
+{#                                                        $
+                            {{ ((asset.amount*asset.averageCost)*(((asset.averageCost - asset.currentPrice)
+                            / asset.currentPrice)))
+                            |number_format(2, '.', ',') }}#}
+{#                            this !!!! #}
+
+{#                            ((((asset.averageCost - asset.currentPrice)#}
+{#                            / asset.averageCost) +1)#}
+{#                            * asset.averageCost#}
+{#                            * asset.amount)#}
+{#                            |number_format(2, '.', ',')#}
                         </td>
 
                         {#                        <td> #}
@@ -176,16 +183,31 @@
                         <td>
                             {% if asset.currentPrice > asset.averageCost %}
                                 <span class="text-danger">
-                            {{ (((asset.currentPrice-asset.averageCost)
-                            /asset.averageCost)*100)|number_format(2, '.', ',') }} ▼
+                            {{ ((((asset.averageCost - asset.currentPrice)
+                            / asset.currentPrice))*100)|number_format(2, '.', ',') }} ▼
                         </span>
                             {% else %}
                                 <span class="text-success">
-                            +{{ (((asset.averageCost - asset.currentPrice)
-                                    / asset.averageCost)*100)|number_format(2, '.', ',') }} ▲
+                            +{{ ((((asset.averageCost - asset.currentPrice)
+                                    / asset.currentPrice))*100)|number_format(2, '.', ',') }} ▲
                         </span>
                             {% endif %}
                         </td>
+
+                        <td>
+                            {% if asset.currentPrice < asset.averageCost %}
+                                <span class="text-success">
+                                                +${{ ((asset.amount*asset.averageCost)*(((asset.averageCost - asset.currentPrice)
+                            / asset.currentPrice)))|number_format(2, '.', ',') }}
+                                            </span>
+                            {% else %}
+                                <span class="text-danger">
+                                                -${{ (((asset.amount*asset.averageCost)*(((asset.averageCost - asset.currentPrice)
+                            / asset.currentPrice)))*(-1))|number_format(2, '.', ',') }}
+                                            </span>
+                            {% endif %}
+                        </td>
+{#                       'short' section end #}
                     {% else %}
                         <td>${{ (asset.amount*asset.currentPrice)|number_format(2, '.', ',') }}</td>
 
@@ -200,19 +222,19 @@
                         </span>
                             {% endif %}
                         </td>
+                        <td>
+                            {% if asset.currentPrice > asset.averageCost %}
+                                <span class="text-success">
+                                                +${{ ((asset.currentPrice-asset.averageCost)*asset.amount)|number_format(2, '.', ',') }}
+                                            </span>
+                            {% else %}
+                                <span class="text-danger">
+                                                -${{ ((asset.averageCost-asset.currentPrice)*asset.amount)|number_format(2, '.', ',') }}
+                                            </span>
+                            {% endif %}
+                        </td>
                     {% endif %}
 
-                    {#                    <td> #}
-                    {#                        {% if asset.currentPrice > asset.averageCost %} #}
-                    {#                            <span class="text-success"> #}
-                    {#                            +${{ ((asset.currentPrice-asset.averageCost)*asset.amount)|number_format(2, '.', ',') }} #}
-                    {#                        </span> #}
-                    {#                        {% else %} #}
-                    {#                            <span class="text-danger"> #}
-                    {#                            -${{ ((asset.averageCost-asset.currentPrice)*asset.amount)|number_format(2, '.', ',') }} #}
-                    {#                        </span> #}
-                    {#                        {% endif %} #}
-                    {#                    </td> #}
                 </tr>
             {% endif %}
         {% endfor %}
