@@ -91,7 +91,7 @@
             {% set totalAssetCount = totalAssetCount + 1 %}
 
             {% if asset.type == 'short' %}
-                {% set assetsTotalSum = ((asset.averageCost-asset.currentPrice)*asset.amount) %}
+                {% set assetsTotalSum = assetsTotalSum + ((asset.averageCost-asset.currentPrice)*asset.amount) %}
 
                 {% set totalProfitLoss = totalProfitLoss + ((((asset.averageCost - asset.currentPrice)
                     / asset.currentPrice))*100) %}
@@ -146,7 +146,7 @@
             {% else %}
                 <tr>
                     <td class="centered">
-                        <a href="/?search={{ asset.symbol }}" class="orangeUnderLine">
+                        <a href="/crypto/{{ asset.symbol }}" class="orangeUnderLine">
                             {{ asset.symbol }}{% if asset.type == 'short' %}({{ asset.type }}){% endif %}
                         </a>
                     </td>
@@ -253,7 +253,7 @@
                 </td>
             {% else %}
                 <td class="centered">
-                    <a href="/?search={{ transaction.symbol }}" class="orangeUnderLine">
+                    <a href="/crypto/{{ transaction.symbol }}" class="orangeUnderLine">
                         {{ transaction.symbol }}
                     </a>
                 </td>
