@@ -64,7 +64,7 @@ To install this project on your local machine, follow these steps:
 5. Import the database structure from the "FTX-NOOB_schema.sql" file -
    `mysql -u username -p new_database < FTX-NOOB_schema.sql` (located in "/setup") <br>
    Replace **username** with the **username** that you use to connect to the database,
-   **new_database** with the name of the new database that you want to create
+   **new_database** with the name of the database that you want to use
 
 * If you wish to use the **CoinMarketCap API**, you will need to enter your own API key in the ".env" file.<br>
 * If you wish to use **your own data** for the coins, you can edit the "crypto_coins" table in the database.
