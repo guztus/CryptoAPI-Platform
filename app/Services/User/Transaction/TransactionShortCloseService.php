@@ -12,7 +12,7 @@ use App\Services\User\UserGetInformationService;
 use App\TransactionIdGenerator;
 use App\Validator;
 
-class TransactionBuySellService
+class TransactionShortCloseService
 {
     private CoinsRepository $coinsRepository;
 
@@ -28,14 +28,21 @@ class TransactionBuySellService
         float  $assetAmount
     )
     {
-        $assetType = 'standard';
+        $assetType = 'short';
 
         $currentCoinPrice = ((new CoinsService($this->coinsRepository))->execute($symbol))->getPrice();
 
         $currentUser = (new UserGetInformationService())->execute($userId);
         $userFiatBalance = $currentUser->getFiatBalance();
 
-        $fiatAmount = $assetAmount * $currentCoinPrice;
+        $fiatAmount = 0;
+        if ($transactionType == 'closeShort') {
+            $userOwnedAsset = ((new UserAssetsRepository($this->coinsRepository))->getSingleAsset($userId, $symbol, $assetType));
+
+            if ($userOwnedAsset) {
+                $fiatAmount = (($userOwnedAsset->getAverageCost() - $currentCoinPrice) * $assetAmount);
+            }
+        }
 
         (new Validator())->transaction(
             $userId,
@@ -55,7 +62,7 @@ class TransactionBuySellService
         $_SESSION['alerts']['transaction'] [] =
             ucfirst($transactionType) . " order successful: $assetAmount $symbol for " . number_format($fiatAmount, 2) . " USD!";
 
-        if ($transactionType == 'buy') {
+        if ($transactionType == 'short') {
             $fiatAmount = $fiatAmount * (-1);
         } else {
             $assetAmount = $assetAmount * (-1);
@@ -76,7 +83,6 @@ class TransactionBuySellService
             ->add($transaction);
 
         $oldDollarCostAverage = (new UserAssetsRepository())->getOldDollarCostAverage($userId, $symbol, $assetType);
-
         $purchaseDollarCostAverage = $currentCoinPrice;
 
         (new UserAssetsRepository())

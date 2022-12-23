@@ -19,9 +19,11 @@ class Router
         $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $router) {
             $router->addRoute('GET', '/', [CoinsController::class, 'index']);
 
-            $router->addRoute('POST', '/', [CoinsController::class, 'doTransaction']);
-//            $router->addRoute('POST', '/buySell', [CoinsController::class, 'buySell']);
-//            $router->addRoute('POST', '/short', [CoinsController::class, 'shortPosition']);
+            $router->addRoute('GET', '/crypto/{symbol}', [CoinsController::class, 'index']);
+            $router->addRoute('POST', '/crypto/{symbol}/buy', [CoinsController::class, 'buy']);
+            $router->addRoute('POST', '/crypto/{symbol}/sell', [CoinsController::class, 'sell']);
+            $router->addRoute('POST', '/crypto/{symbol}/short', [CoinsController::class, 'short']);
+            $router->addRoute('POST', '/crypto/{symbol}/closeShort', [CoinsController::class, 'closeShort']);
 
             $router->addRoute('GET', '/register', [RegistrationController::class, 'showForm']);
             $router->addRoute('POST', '/register', [RegistrationController::class, 'register']);

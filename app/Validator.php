@@ -64,14 +64,14 @@ class Validator
         }
     }
 
-    public function buySellTransaction(
-        int     $userId,
-        string  $transactionType,
-        string  $symbol,
-        ?string $assetType,
-        float   $fiatAmount,
-        float   $assetAmount,
-        float   $userFiatBalance
+    public function transaction(
+        int    $userId,
+        string $transactionType,
+        string $symbol,
+        string $assetType,
+        float  $fiatAmount,
+        float  $assetAmount,
+        float  $userFiatBalance
     )
     {
         if ($transactionType !== 'buy'
@@ -121,7 +121,7 @@ class Validator
 
     public function assetAmount(int $userId, string $symbol, int $amount)
     {
-        $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol);
+        $currentAssetAmount = (new UserAssetsRepository())->getAssetAmount($userId, $symbol, 'standard');
         if ($amount > $currentAssetAmount) {
             $_SESSION['errors']['transaction'] [] =
                 "You do not have enough $symbol to send this amount!";

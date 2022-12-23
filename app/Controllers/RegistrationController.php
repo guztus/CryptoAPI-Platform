@@ -16,7 +16,6 @@ class RegistrationController
 
     public function register(): Redirect
     {
-
         (new RegistrationService())->execute(
             $_POST['name'],
             $_POST['email'],

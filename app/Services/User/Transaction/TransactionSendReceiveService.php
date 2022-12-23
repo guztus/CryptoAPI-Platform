@@ -31,13 +31,14 @@ class TransactionSendReceiveService
         (new UserTransactionHistoryRepository())
             ->add($transaction);
 
-        $oldDollarCostAverage = (new UserAssetsRepository())->getOldDollarCostAverage($userId, $symbol);
+        $oldDollarCostAverage = (new UserAssetsRepository())->getOldDollarCostAverage($userId, $symbol, 'standard');
 
         (new UserAssetsRepository())
             ->modifyAssets(
                 $userId,
                 $transactionType,
                 $symbol,
+                'standard',
                 $amount,
                 null,
                 $oldDollarCostAverage,

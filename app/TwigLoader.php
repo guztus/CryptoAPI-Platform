@@ -5,8 +5,6 @@ namespace App;
 use App\ViewVariables\AlertsViewVariables;
 use App\ViewVariables\AuthViewVariables;
 use App\ViewVariables\ErrorsViewVariables;
-use App\ViewVariables\TransactionHistoryViewVariables;
-use App\ViewVariables\UserAssetsViewVariables;
 use App\ViewVariables\ViewVariablesInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -18,7 +16,7 @@ class TwigLoader
     public function getTwig(): Environment
     {
         if (self::$twig == null) {
-            $loader = new FilesystemLoader('views');
+            $loader = new FilesystemLoader('../views');
             self::$twig = new Environment($loader);
         }
         $this->addGlobal();
@@ -31,8 +29,6 @@ class TwigLoader
             AuthViewVariables::class,
             AlertsViewVariables::class,
             ErrorsViewVariables::class,
-            UserAssetsViewVariables::class,
-//            TransactionHistoryViewVariables::class
         ];
 
         foreach ($authVariables as $variable) {

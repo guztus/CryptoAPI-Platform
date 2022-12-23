@@ -3,7 +3,6 @@
 use App\Repositories\Coins\CoinsRepository;
 use App\Repositories\Coins\CryptoCoinTable;
 use App\Router;
-//use App\UserActions;
 
 require_once '../vendor/autoload.php';
 
