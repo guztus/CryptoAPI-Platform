@@ -6,8 +6,11 @@ use App\Repositories\User\UserAssetsRepository;
 
 class UserAssetService
 {
-    public function show(int $userId, string $symbol): array
+    public function show(?int $userId, string $symbol): array
     {
+        if (!$userId) {
+            return [];
+        } else
         $asset = (new UserAssetsRepository())->getSingleAsset($userId, $symbol, 'standard');
         $assetShort = (new UserAssetsRepository())->getSingleAsset($userId, $symbol, 'short');
 

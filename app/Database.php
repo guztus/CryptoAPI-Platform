@@ -13,11 +13,11 @@ class Database
     {
         if (self::$connection == null) {
             $connectionParams = [
-                'dbname' => 'CryptoAPI-Platform',
+                'dbname' => $_ENV['DATABASENAME'],
                 'user' => $_ENV['DATABASEUSER'],
                 'password' => $_ENV['DATABASEPASSWORD'],
-                'host' => 'localhost',
-                'driver' => 'pdo_mysql',
+                'host' => $_ENV['DATABASEHOST'],
+                'driver' => $_ENV['DATABASEDRIVER'],
             ];
             self::$connection = DriverManager::getConnection($connectionParams);
         }

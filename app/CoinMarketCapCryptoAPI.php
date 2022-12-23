@@ -6,8 +6,6 @@ use GuzzleHttp\Client;
 
 class CoinMarketCapCryptoAPI
 {
-    private Object $results;
-//        $url = 'https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'; // DUMMY DATA
     private string $url = 'https://pro-api.coinmarketcap.com/';
     private array $headers;
 
@@ -15,7 +13,7 @@ class CoinMarketCapCryptoAPI
     {
         $this->headers = [
             "Accepts" => " application/json",
-            "X-CMC_PRO_API_KEY" => $_ENV['APIKEY']
+            "X-CMC_PRO_API_KEY" => $_ENV['COINMARKETCAP_APIKEY']
         ];
     }
 
