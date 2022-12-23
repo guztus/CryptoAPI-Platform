@@ -71,7 +71,8 @@ To install this project on your local machine, follow these steps:
 
 And you are ready to roll! ;)
 
-To run the project, locate "/public" and there, you can use a command such as `php -S localhost:8000`.
+To run the project, locate "/public" and there, you can use a command such as `php -S localhost:8000` to run the project
+in your browser.
 
 ## Further information
 
