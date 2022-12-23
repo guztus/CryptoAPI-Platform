@@ -61,8 +61,8 @@ To install this project on your local machine, follow these steps:
 2. Install all dependencies - `composer install`
 3. Rename the ".env.example" file to ".env" <br>
 4. Create a database and add the credentials to the ".env" file
-5. Import the database structure from the "FTX-NOOB_schema.sql" file -
-   `mysql -u username -p new_database < FTX-NOOB_schema.sql` (located in "/setup") <br>
+5. Import the database structure from the "FTX-NOOB_schema.sql" file (located in "/setup") -
+   `mysql -u username -p new_database < FTX-NOOB_schema.sql`<br>
    Replace **username** with the **username** that you use to connect to the database,
    **new_database** with the name of the database that you want to use
 
