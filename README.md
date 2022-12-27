@@ -24,34 +24,28 @@ CoinMarketCap API)
 <div style="text-align: center">
     <h3>Purchasing Crypto (+ history and asset list)</h3>
     <p align="center">
-        <img src="https://github.com/guztus/CryptoAPI-Platform/blob/master/DEMO_GIFS/part_1.gif" alt="animated-demo" /><br>
+        <img src="/DEMO_GIFS/buy_sell.gif" alt="animated-demo" /><br>
     </p>
-    <h3>Sending Crypto to other users</h3>
+    <h3>Opening Short positions</h3>
     <p align="center">
-        <img src="https://github.com/guztus/CryptoAPI-Platform/blob/master/DEMO_GIFS/part_2.gif" alt="animated-demo" /><br>
+        <img src="/DEMO_GIFS/short.gif" alt="animated-demo" /><br>
     </p>
-
+    <h3>Sending coins to other users</h3>
+    <p align="center">
+        <img src="/DEMO_GIFS/send.gif" alt="animated-demo" /><br>
+    </p>
+    <h3>Table sorting</h3>
+    <p align="center">
+        <img src="/DEMO_GIFS/table_sorting.gif" alt="animated-demo" /><br>
+    </p>
 </div>
 
 ## Used Technologies
 
 * PHP `7.4`
-* MySQL `8`
-  <br><br>
-* Bootstrap `5`
-* Composer `2.4.3`
-
-#### The following PHP packages and extensions are used:
-
-    * twig/twig: 3.4
-    * nikic/fast-route: 1.3
-    * vlucas/phpdotenv: 5.5
-    * egulias/email-validator: 3.2
-    * doctrine/dbal: 3.5
-    * guzzlehttp/guzzle: 7.5
-    * php-di/php-di 6.4
-    * ext-json
-    * ext-curl
+* MySQL `8.0`
+* Bootstrap `5.2`
+* Composer `2.4`
 
 ## Setup
 
@@ -69,16 +63,11 @@ To install this project on your local machine, follow these steps:
 * If you wish to use the **CoinMarketCap API**, you will need to enter your own API key in the ".env" file.<br>
 * If you wish to use **your own data** for the coins, you can edit the "crypto_coins" table in the database.
 
-And you are ready to roll! ;)
-
 To run the project, locate "/public" and there, you can use a command such as `php -S localhost:8000` to run the project
 in your browser.
 
 ## Further information
 
-To choose which data (**API** or **your own**) to display, you will need to change a line in the `index.php` file. <br>
+To choose which data (**API** or **your own**) to display, you can select your choice in the "dataSourceConfig.php" file. <br>
 
-* To use **API data** (set as standard) -
-  `$container->set(CoinsRepository::class, \DI\create(\App\Repositories\Coins\CoinMarketCapCryptoCoinsRepository::class));`
-* To use **your own data** -
-  `$container->set(CoinsRepository::class, \DI\create(CryptoCoinTable::class));`
+By default, it uses the **CoinMarketCap API**.
