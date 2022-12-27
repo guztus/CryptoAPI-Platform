@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
 use App\Repositories\Coins\CoinsRepository;
-use App\Repositories\Coins\CryptoCoinTable;
 use App\Router;
 
 require_once '../vendor/autoload.php';
+$coinInformationSource = include('../dataSourceConfig.php');
 
 session_start();
 
@@ -12,7 +12,6 @@ session_start();
 
 $container = new DI\Container();
 
-$container->set(CoinsRepository::class, \DI\create(\App\Repositories\Coins\CoinMarketCapCryptoCoinsRepository::class));
-//$container->set(CoinsRepository::class, \DI\create(CryptoCoinTable::class));
+$container->set(CoinsRepository::class, \DI\create($coinInformationSource['source']));
 
 Router::route($container);
